@@ -8,7 +8,20 @@ The company me and my wife run is called Azm Dev (Awesome dev).
 Blazor + Azm == Blazm and it will make you site blazm (blossom).
 I know.... I like puns.
 
+**Forecast sample using Blazm**
+``` HTML
+<BlazmGrid Data="forecasts" PageSize="10" Sortable="true" SortField="@nameof(WeatherForecast.Date)">
+    <GridColumns>
+        <GridColumn Field="@nameof(WeatherForecast.Date)" Format="{0:d}"  Priority="3"/>
+        <GridColumn Field="@nameof(WeatherForecast.TemperatureC)" HighlightSign="true" Priority="1" Class="alignRight" />
+        <GridColumn Field="@nameof(WeatherForecast.TemperatureF)" Priority="2" Class="alignRight"/>
+        <GridColumn Field="@nameof(WeatherForecast.Summary)"  Priority="0"/>
+    </GridColumns>
+</BlazmGrid>
+```
+
 ## How to get started 
+
 ### Prerequisites
 At this point the library is using [Bootstrap](https://getbootstrap.com/).
 This might change in the future but for now You will need Bootstrap.

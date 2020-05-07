@@ -23,8 +23,8 @@ else
     <BlazmGrid Data="forecasts" PageSize="10" Sortable="true" SortField="@nameof(WeatherForecast.Date)">
         <GridColumns>
             <GridColumn Field="@nameof(WeatherForecast.Date)" Format="{0:d}"  Priority="3"/>
-            <GridColumn Field="@nameof(WeatherForecast.TemperatureC)" HighlightSign="true" Priority="1" />
-            <GridColumn Field="@nameof(WeatherForecast.TemperatureF)" Priority="2"/>
+            <GridColumn Field="@nameof(WeatherForecast.TemperatureC)" HighlightSign="true" Priority="1" Class="alignRight" />
+            <GridColumn Field="@nameof(WeatherForecast.TemperatureF)" Priority="2" Class="alignRight"/>
             <GridColumn Field="@nameof(WeatherForecast.Summary)"  Priority="0"/>
         </GridColumns>
     </BlazmGrid>
