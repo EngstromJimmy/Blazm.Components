@@ -1,0 +1,46 @@
+﻿@namespace Blazm.Components
+@typeparam TItem
+
+@if (Columns.Any(c => !c.Visible))
+{
+    <tr class="@(ExpandedRows.Contains(Row.GetHashCode()) ? "" : "hidden")">
+        <td colspan="@(Columns.Count(c => !c.Visible)+ (ShowCheckbox?1:0))">
+            <dl>
+                @foreach (var hiddencolumn in Columns.Where(c => !c.Visible))
+                {
+                    <dt>@hiddencolumn.Title</dt>
+                    <dd>
+
+                        @if (hiddencolumn.Template == null)
+                        {
+                            @if (hiddencolumn.Format == null)
+                            {
+                                @Row.GetType().GetProperty(hiddencolumn.Field).GetValue(Row)
+                            }
+                            else
+                            {
+                                @string.Format(hiddencolumn.Format, Row.GetType().GetProperty(hiddencolumn.Field).GetValue(Row))
+                            }
+                        }
+                        else
+                        {
+                            @hiddencolumn.Template(Row)
+                        }
+                    </dd>
+                }
+            </dl>
+        </td>
+    </tr>
+}
+@code {
+    [Parameter]
+    public List<IGridColumn> Columns { get; set; } = new List<IGridColumn>();
+    [Parameter]
+    public List<int> ExpandedRows { get; set; } = new List<int>();
+    [Parameter]
+    public TItem Row { get; set; }
+    [Parameter]
+    public bool ShowCheckbox { get; set; }
+
+
+}

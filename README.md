@@ -1,2 +1,155 @@
-# Blazm
-A few useful and awesome components for Blazor.  Blazor + awesome (azm)=Blazm (Blossom)
+# How to use Blazm
+
+I promissed myself that I wouldn't build another component library.
+But for different reasons I had to build a Grid control (and some other components), and why not share that with others?
+So here it is, my component library.
+
+The company me and my wife run is called Azm Dev (Awesome dev).
+Blazor + Azm == Blazm and it will make you site blazm (blossom).
+I know.... I like puns.
+
+## How to get started 
+### Prerequisites
+At this point the library is using [Bootstrap](https://getbootstrap.com/).
+This might change in the future but for now You will need Bootstrap.
+It is also using [FontAwesome](https://fontawesome.com/) so make sure you reference that as well.
+
+### In Startup.cs
+
+1. Add ```services.AddGrid();```
+This adds the necessary things for the grid to be responsive.
+
+### In your .Razor file
+
+1. Add ```using Blazm.Components```
+2. Add your grid
+
+``` html
+<BlazmGrid Data="TestData" PageSize="10">
+    <GridColumns>
+        <GridColumn Field="@nameof(TestClass.String)" Title="A string from property"></GridColumn>
+        <GridColumn Field="@nameof(TestClass.Double)"></GridColumn>
+        <GridColumn Field="@nameof(TestClass.Date)"></GridColumn>
+    </GridColumns>
+</BlazmGrid>
+```
+
+### Add Script and Styles
+**In Pages/_Host.cshtml**
+1. In side the head tag add ``` <link href="_content/Blazm.Components/css/styles.min.css" rel="stylesheet" /> ```
+2. After the script tag (towards the bottom of the page) refering to blazor.server.js.
+3. Add ```<script src="_content/Blazm.Components/scripts/jsinterop..min.js"></script> ```
+4. and add ```<script src="_content/BlazorPro.BlazorSize/blazorSize.min.js"></script>```
+5. 
+
+**In program.cs**
+1. Add ```webBuilder.UseStaticWebAssets();```
+
+## Grid Features
+
+### Paging
+
+By specifying a number in the ``` PageSize ``` property the grid will add next and previous buttons and page the data.
+
+
+### Sorting
+
+To sort the grid use 
+```SortField="@nameof(TestClass.Double)"``` to sort your grid.
+If you want to enable the user to sort the grid use ``` Sortable="true" ```.
+Set det defaul sort direction by setting the ```SortDirection``` parameter
+
+This works with grouped lists as well.
+To sort the grouping you can use ```GroupSortField="@nameof(TestClass.Double)"```
+
+### Checkboxes
+
+Use ```ShowCheckbox="true"``` to show checkboxes on every row.
+Use ```@bind-SelectedData="SelectedTestData"``` to get the selected items.
+
+### Grouping
+To add grouping set the data as usual (without grouping) and set the GroupBy-Parameter.
+
+``` csharp
+GroupBy="d=>d.Group" 
+``` 
+
+## Footer
+
+Footers are available in group and for the whole table.
+GroupFooterTemplate will get a List<T> containing all the data in that group.
+
+``` csharp
+var h = context as List<TestClass>;
+@h.Sum(r => r.Double).ToString("N0")
+```
+Will sum all the Double-field in that group.
+
+FooterTemplate will get a List<T> containing all the rows in the table.
+
+``` csharp
+var h = context as List<TestClass>;
+@h.Sum(r => r.Double).ToString("N0")
+```
+
+Will sum ALL the double-fields in the entire table.
+
+``` csharp
+            <GridColumn Field="@nameof(TestClass.Double)" Format="{0:N2}">
+                <GroupFooterTemplate>
+                    @{
+                        var h = context as List<TestClass>;
+                        @h.Sum(r => r.Double).ToString("N0")
+                    }
+                </GroupFooterTemplate>
+                <FooterTemplate>
+                    @{
+                        var h = context as List<TestClass>;
+                        @h.Sum(r => r.Double).ToString("N0")
+                    }
+                </FooterTemplate>
+            </GridColumn>
+```
+
+## Column features
+
+### Column header
+
+The title of the column can be specified by using the title property but can also be specified using the Display-attribute
+``` csharp
+public class TestClass
+{
+    public string String { get; set; }
+    [Display(Name = "Comes from attribute")]
+    public double Double { get; set; }
+    public DateTime Date { get; set; }
+}
+```
+
+### Formating
+
+To add formating to the data, use the Format property.
+
+``` html
+<GridColumn Field="@nameof(TestClass.Double)" Format="{0:N2}"></GridColumn>
+```
+
+## Style
+There are two ways of styling content.
+```Class``` will set the class attribute on the header and data.
+```HeaderClass``` will set the class attribute on the header.
+```DataClass``` will set the class attribute on the data.
+If you want to align both data and header to the right add the class property.
+
+``` html
+<GridColumn  ... Class="alignRight" ... />
+```
+
+### HighlightSign
+
+To highlight the sign on a column set the HighlightSign to true.
+This will set the class .negative if the value is negative.
+It will set the class .positive if the value is positive and leave it alone of the value is zero.
+Use ```ValueNegativeClass``` and ```ValuePositiveClass``` to specify the classes used.
+
+

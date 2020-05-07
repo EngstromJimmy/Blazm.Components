@@ -1,0 +1,189 @@
+﻿@namespace Blazm.Components
+@implements IGridColumn
+
+<th @onclick="@(()=>ContainerGrid?.Sort(this))" class="@Class @HeaderClass @(ContainerGrid.Sortable?"cursor-pointer":"")">@Title <span class="fa @(GetSortStyle(this.Field))"></span></th>
+
+@code {
+
+    [CascadingParameter]
+    private IGridContainer? ContainerGrid { get; set; }
+
+
+    [Parameter]
+    public string Width
+    {
+        get;
+        set;
+    }
+
+    [Parameter]
+    public int Priority
+    {
+        get;
+        set;
+    } = 0;
+
+    private string _Headerclass = "";
+    [Parameter]
+    public string HeaderClass
+    {
+        get { return _Headerclass; }
+        set { _Headerclass = value; }
+    }
+
+    private string _class = "";
+    [Parameter]
+    public string Class
+    {
+        get { return _class + " " + (Visible ? "" : "hiddencell"); ; }
+        set { _class = value; }
+    }
+
+    [Parameter]
+    public bool HighlightSign
+    {
+        get;
+        set;
+    } = false;
+
+    public bool Visible
+    {
+        get;
+        set;
+    } = true;
+
+
+    [Parameter]
+    public int ClientWidth
+    {
+        get;
+        set;
+    }
+
+    [Parameter]
+    public string Field
+    {
+        get;
+        set;
+    }
+    [Parameter]
+    public string Format
+    {
+        get;
+        set;
+    }
+    [Parameter]
+    public Type Type
+    {
+        get;
+        set;
+    }
+
+    private string valueNegativeClass = "";
+
+    [Parameter]
+    public string ValueNegativeClass
+    {
+        get
+        {
+            if (HighlightSign && string.IsNullOrEmpty(valueNegativeClass))
+            {
+                return "negative";
+            }
+            return valueNegativeClass;
+        }
+        set { valueNegativeClass = value; }
+    }
+
+    private string valuePositiveClass = "";
+    [Parameter]
+    public string ValuePositiveClass
+    {
+        get
+        {
+            if (HighlightSign && string.IsNullOrEmpty(valuePositiveClass))
+            {
+                return "positive";
+            }
+            return valuePositiveClass;
+        }
+        set { valuePositiveClass = value; }
+    }
+
+    [Parameter]
+    public string DataClass
+    {
+        get;
+        set;
+    } = "";
+
+    private string? title = null;
+    [Parameter]
+    public string Title
+    {
+        get
+        {
+            if (Type != null && Field != null)
+            {
+                var displayattribute = Type
+                .GetProperty(Field)
+                .GetCustomAttribute<DisplayAttribute>();
+                if (title == null && displayattribute != null)
+                {
+                    this.title = displayattribute.Name;
+                }
+            }
+            return this.title ?? this.Field;
+        }
+        set
+        {
+            this.title = value;
+        }
+    }
+
+    [Parameter]
+    public RenderFragment<object> Template
+    {
+        get;
+        set;
+    }
+
+    [Parameter]
+    public RenderFragment<object> FooterTemplate
+    {
+        get;
+        set;
+    }
+
+
+
+    [Parameter]
+    public RenderFragment<object> GroupFooterTemplate
+    {
+        get;
+        set;
+    }
+
+
+    protected override void OnInitialized()
+    {
+        this.ContainerGrid.AddColumn(this);
+        base.OnInitialized();
+    }
+
+    private string GetSortStyle(string columnName)
+    {
+        if (this.ContainerGrid.SortField != columnName)
+        {
+            return string.Empty;
+        }
+        if (this.ContainerGrid.SortDirection == System.ComponentModel.ListSortDirection.Ascending)
+        {
+            return "fa-sort-up";
+        }
+        else
+        {
+            return "fa-sort-down";
+        }
+    }
+}

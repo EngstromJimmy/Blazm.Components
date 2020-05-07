@@ -1,0 +1,13 @@
+ .hiddencell{
+        display:none;
+    }
+.countableClientWidth > tbody > tr > th, /*When grouped*/
+.countableClientWidth > tbody > tr > td,
+.countableClientWidth > thead > tr > th {
+    display: table-cell !important;
+    opacity: 0;
+}
+
+.expandable td:first-child::before {
+    content: '+';
+}
