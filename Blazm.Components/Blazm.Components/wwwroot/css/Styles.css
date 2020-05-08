@@ -7,9 +7,6 @@
   display: table-cell !important;
   opacity: 0; }
 
-.expandable td:first-child::before {
-  content: '+'; }
-
 .negative {
   color: red; }
 

@@ -9,7 +9,7 @@ namespace Blazm.Components
         void RemoveColumn(IGridColumn column);
 
         Task Sort(IGridColumn column);
-        string? SortField
+        string SortField
         {
             get;
             set;

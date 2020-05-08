@@ -1,10 +1,12 @@
-﻿[
+[
   {
     "outputFile": "wwwroot/css/Styles.css",
-    "inputFile": "Styles/Styles.scss"
+    "inputFile": "Styles/Styles.scss",
+    "sourceMap": false
   },
   {
     "outputFile": "wwwroot/Scripts/JSInterop.js",
-    "inputFile": "Scripts/JSInterop.js"
+    "inputFile": "Scripts/JSInterop.js",
+    "sourceMap": false
   }
 ]

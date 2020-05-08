@@ -6,7 +6,7 @@
 @code {
 
     [CascadingParameter]
-    private IGridContainer? ContainerGrid { get; set; }
+    private IGridContainer ContainerGrid { get; set; }
 
 
     [Parameter]
@@ -117,7 +117,7 @@
         set;
     } = "";
 
-    private string? title = null;
+    private string title = null;
     [Parameter]
     public string Title
     {
