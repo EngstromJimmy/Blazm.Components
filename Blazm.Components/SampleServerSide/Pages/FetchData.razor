@@ -44,7 +44,7 @@ else
     </BlazmGrid>
 
     <h2>BlazmGrid grouped</h2>
-    <BlazmGrid GroupBy="d=>d.Summary" Data="forecasts" PageSize="10" Sortable="true" SortField="@nameof(WeatherForecast.Date)" ShowFooter="true" ShowGroupFooter="true" >
+    <BlazmGrid GroupBy="d=>d.Summary" Data="forecasts.Take(20)" PageSize="10" Sortable="true" SortField="@nameof(WeatherForecast.Date)" ShowFooter="true" ShowGroupFooter="true" >
         <GroupHeader>
             <h5>@context</h5>
         </GroupHeader>
