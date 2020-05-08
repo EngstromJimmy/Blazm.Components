@@ -1,12 +1,17 @@
 # How to use Blazm
 
 I promised myself that I wouldn't build another component library.
-But for different reasons I had to build a Grid control (and some other components), and why not share that with others?
+But for different reasons I had to build a Grid component (and some other components), and why not share that with others?
 So here it is, my component library.
 
 The company me and my wife run is called Azm Dev (Awesome dev).
 Blazor + Azm == Blazm and it will make you site blazm (blossom).
 I know.. I like puns.
+
+
+##Components
+
+BlazmGrid
 
 **Forecast sample using Blazm**
 ``` HTML
@@ -24,13 +29,13 @@ I know.. I like puns.
 
 ### Prerequisites
 
-At this point the library is using [Bootstrap](https://getbootstrap.com/).
-This might change in the future but for now You will need Bootstrap.
+At this point the library is using [Bootstrap](https://getbootstrap.com/).  
+This might change in the future but for now you will need Bootstrap.  
 It is also using [FontAwesome](https://fontawesome.com/) so make sure you reference that as well.
 
 ### In Startup.cs
 
-1. Add ```services.AddGrid();```
+1. Add ```services.AddGrid();```  
 This adds the necessary things for the grid to be responsive.
 
 ### In your .Razor file
@@ -52,10 +57,13 @@ This adds the necessary things for the grid to be responsive.
 
 **In Pages/_Host.cshtml**
 
-1. In side the head tag add ``` <link href="_content/Blazm.Components/css/styles.min.css" rel="stylesheet" /> ```
+1. Inside the head tag add ``` <link href="_content/Blazm.Components/css/styles.min.css" rel="stylesheet" /> ```
 2. After the script tag (towards the bottom of the page) referring to blazor.server.js.
-3. Add ```<script src="_content/Blazm.Components/scripts/jsinterop..min.js"></script>```
-4. and add ```<script src="_content/BlazorPro.BlazorSize/blazorSize.min.js"></script>```
+Add 
+``` html 
+<script src="_content/Blazm.Components/scripts/jsinterop..min.js"></script>
+<script src="_content/BlazorPro.BlazorSize/blazorSize.min.js"></script>
+```
 
 **In program.cs**
 1. Add ```webBuilder.UseStaticWebAssets();```
@@ -83,7 +91,7 @@ Use ```@bind-SelectedData="SelectedTestData"``` to get the selected items.
 
 ### Grouping
 
-To add grouping set the data as usual (without grouping) and set the GroupBy-Parameter.
+To add grouping set the data as usual (without grouping) and set the GroupBy-parameter.
 
 ``` csharp
 GroupBy="d=>d.Group"
@@ -104,7 +112,7 @@ Context is the group key.
 ### Footer
 
 Footers are available in grouped segments and for the whole table.
-GroupFooterTemplate will get a List<T> containing all the data in that group.
+In the GroupFooterTemplate the ```context```-variable is a List<T> containing all the data in that group.
 
 ``` csharp
 <GroupFooterTemplate>
@@ -161,7 +169,7 @@ public class TestClass
 
 ### Format
 
-To format the data, use the Format property.
+To format the data, use the Format-property.
 
 ``` html
 <GridColumn Field="@nameof(TestClass.Double)" Format="{0:N2}"></GridColumn>
@@ -184,4 +192,12 @@ If you want to align both data and header to the right add the class property.
 To highlight the sign on a column set the HighlightSign to true.
 This will set the class .negative if the value is negative.
 It will set the class .positive if the value is positive and leave it alone of the value is zero.
-Use ```ValueNegativeClass``` and ```ValuePositiveClass``` to specify the classes used.
+Use ```ValueNegativeClass``` and ```ValuePositiveClass``` to specify the classes used (if you want to).
+
+### Priority (Responsive)
+
+By adding Priority to the columns the grid will become responsive and hide columns in the order of priority.
+Priority 0 is the highest priority which means the column will always be visible.
+It uses [BlazorPro.BlazorSize](https://github.com/EdCharbeneau/BlazorSize) by Ed Charbeneau to detect resize on the client.
+If a column is hidden, an icon will appear and the row will become expandable (to show the removed columns).
+The icon is customizable using ```ExpandTemplate``` and ```CollapseTemplate```
