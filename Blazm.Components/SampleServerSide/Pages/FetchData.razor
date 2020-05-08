@@ -20,11 +20,25 @@
 else
 {
     <h2>BlazmGrid</h2>
-    <BlazmGrid Data="forecasts" PageSize="10" Sortable="true" SortField="@nameof(WeatherForecast.Date)">
+    <BlazmGrid Data="forecasts" PageSize="10" Sortable="true" SortField="@nameof(WeatherForecast.Date)" ShowFooter="true">
         <GridColumns>
             <GridColumn Field="@nameof(WeatherForecast.Date)" Format="{0:d}"  Priority="3"/>
-            <GridColumn Field="@nameof(WeatherForecast.TemperatureC)" HighlightSign="true" Priority="1" Class="alignRight" />
-            <GridColumn Field="@nameof(WeatherForecast.TemperatureF)" Priority="2" Class="alignRight"/>
+            <GridColumn Field="@nameof(WeatherForecast.TemperatureC)" HighlightSign="true" Priority="1" Class="alignRight">
+                <FooterTemplate>
+                @{ 
+                    var temp = context as WeatherForecast[];
+                }
+                @temp.Sum(t=>t.TemperatureC)
+                </FooterTemplate>
+            </GridColumn>
+            <GridColumn Field="@nameof(WeatherForecast.TemperatureF)" Priority="2" Class="alignRight">
+                <FooterTemplate>
+                    @{
+                        var temp = context as WeatherForecast[];
+                    }
+                    @temp.Sum(t => t.TemperatureF)
+                </FooterTemplate>
+            </GridColumn>
             <GridColumn Field="@nameof(WeatherForecast.Summary)"  Priority="0"/>
         </GridColumns>
     </BlazmGrid>

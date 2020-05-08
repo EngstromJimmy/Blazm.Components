@@ -1,12 +1,12 @@
 # How to use Blazm
 
-I promissed myself that I wouldn't build another component library.
+I promised myself that I wouldn't build another component library.
 But for different reasons I had to build a Grid control (and some other components), and why not share that with others?
 So here it is, my component library.
 
 The company me and my wife run is called Azm Dev (Awesome dev).
 Blazor + Azm == Blazm and it will make you site blazm (blossom).
-I know.... I like puns.
+I know.. I like puns.
 
 **Forecast sample using Blazm**
 ``` HTML
@@ -20,9 +20,10 @@ I know.... I like puns.
 </BlazmGrid>
 ```
 
-## How to get started 
+## How to get started
 
 ### Prerequisites
+
 At this point the library is using [Bootstrap](https://getbootstrap.com/).
 This might change in the future but for now You will need Bootstrap.
 It is also using [FontAwesome](https://fontawesome.com/) so make sure you reference that as well.
@@ -48,12 +49,13 @@ This adds the necessary things for the grid to be responsive.
 ```
 
 ### Add Script and Styles
+
 **In Pages/_Host.cshtml**
+
 1. In side the head tag add ``` <link href="_content/Blazm.Components/css/styles.min.css" rel="stylesheet" /> ```
-2. After the script tag (towards the bottom of the page) refering to blazor.server.js.
-3. Add ```<script src="_content/Blazm.Components/scripts/jsinterop..min.js"></script> ```
+2. After the script tag (towards the bottom of the page) referring to blazor.server.js.
+3. Add ```<script src="_content/Blazm.Components/scripts/jsinterop..min.js"></script>```
 4. and add ```<script src="_content/BlazorPro.BlazorSize/blazorSize.min.js"></script>```
-5. 
 
 **In program.cs**
 1. Add ```webBuilder.UseStaticWebAssets();```
@@ -64,13 +66,12 @@ This adds the necessary things for the grid to be responsive.
 
 By specifying a number in the ``` PageSize ``` property the grid will add next and previous buttons and page the data.
 
-
 ### Sorting
 
 To sort the grid use 
 ```SortField="@nameof(TestClass.Double)"``` to sort your grid.
 If you want to enable the user to sort the grid use ``` Sortable="true" ```.
-Set det defaul sort direction by setting the ```SortDirection``` parameter
+Set the default sort direction by setting the ```SortDirection``` parameter
 
 This works with grouped lists as well.
 To sort the grouping you can use ```GroupSortField="@nameof(TestClass.Double)"```
@@ -81,47 +82,65 @@ Use ```ShowCheckbox="true"``` to show checkboxes on every row.
 Use ```@bind-SelectedData="SelectedTestData"``` to get the selected items.
 
 ### Grouping
+
 To add grouping set the data as usual (without grouping) and set the GroupBy-Parameter.
 
 ``` csharp
-GroupBy="d=>d.Group" 
-``` 
+GroupBy="d=>d.Group"
+```
 
-## Footer
+### Group header
 
-Footers are available in group and for the whole table.
+If you group your grid you can add a group header.
+It will add a table row with the content in the template.
+Context is the group key.
+
+``` csharp
+<GroupHeader>
+    <h5>@context</h5>
+<GroupHeader>
+```
+
+### Footer
+
+Footers are available in grouped segments and for the whole table.
 GroupFooterTemplate will get a List<T> containing all the data in that group.
 
 ``` csharp
-var h = context as List<TestClass>;
-@h.Sum(r => r.Double).ToString("N0")
+<GroupFooterTemplate>
+    var h = context as List<TestClass>;
+    @h.Sum(r => r.Double).ToString("N0")
+</GroupFooterTemplate>
 ```
+
 Will sum all the Double-field in that group.
 
 FooterTemplate will get a List<T> containing all the rows in the table.
 
 ``` csharp
-var h = context as List<TestClass>;
-@h.Sum(r => r.Double).ToString("N0")
+<FooterTemplate>
+    var h = context as List<TestClass>;
+    @h.Sum(r => r.Double).ToString("N0")
+</FooterTemplate>
 ```
 
 Will sum ALL the double-fields in the entire table.
 
 ``` csharp
-            <GridColumn Field="@nameof(TestClass.Double)" Format="{0:N2}">
-                <GroupFooterTemplate>
-                    @{
-                        var h = context as List<TestClass>;
-                        @h.Sum(r => r.Double).ToString("N0")
-                    }
-                </GroupFooterTemplate>
-                <FooterTemplate>
-                    @{
-                        var h = context as List<TestClass>;
-                        @h.Sum(r => r.Double).ToString("N0")
-                    }
-                </FooterTemplate>
-            </GridColumn>
+<GridColumn Field="@nameof(TestClass.Double)" Format="{0:N2}">
+    <GroupFooterTemplate>
+        @{
+            var h = context as List<TestClass>;
+            @h.Sum(r => r.Double).ToString("N0")
+        }
+    </GroupFooterTemplate>
+    <FooterTemplate>
+        @{
+            var h = context as List<TestClass>;
+            @h.Sum(r => r.Double).ToString("N0")
+        }
+    </FooterTemplate>
+</GridColumn>
 ```
 
 ## Column features
@@ -129,6 +148,7 @@ Will sum ALL the double-fields in the entire table.
 ### Column header
 
 The title of the column can be specified by using the title property but can also be specified using the Display-attribute
+
 ``` csharp
 public class TestClass
 {
@@ -139,15 +159,16 @@ public class TestClass
 }
 ```
 
-### Formating
+### Format
 
-To add formating to the data, use the Format property.
+To format the data, use the Format property.
 
 ``` html
 <GridColumn Field="@nameof(TestClass.Double)" Format="{0:N2}"></GridColumn>
 ```
 
-## Style
+### Style
+
 There are two ways of styling content.
 ```Class``` will set the class attribute on the header and data.
 ```HeaderClass``` will set the class attribute on the header.
@@ -164,5 +185,3 @@ To highlight the sign on a column set the HighlightSign to true.
 This will set the class .negative if the value is negative.
 It will set the class .positive if the value is positive and leave it alone of the value is zero.
 Use ```ValueNegativeClass``` and ```ValuePositiveClass``` to specify the classes used.
-
-
