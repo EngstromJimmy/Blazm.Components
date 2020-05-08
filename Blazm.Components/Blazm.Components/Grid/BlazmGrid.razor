@@ -238,6 +238,10 @@
 
         <ul class="pagination">
             <li class="page-item @(CurrentPage==0?"disabled":"cursor-pointer")"><a class="page-link" @onclick="PreviousPage">@PreviousText</a></li>
+            @if (ShowPageCounter)
+            {
+                <li class="page-item page-count">@(CurrentPage + 1) / @(Data.Count() / PageSize)</li>
+            }
             <li class="page-item  @((((CurrentPage * PageSize)+PageSize) < Data.Count())?"cursor-pointer":"disabled")"><a class="page-link" @onclick="NextPage">@NextText</a></li>
         </ul>
 
@@ -390,6 +394,14 @@ public string SortField
     get;
     set;
 } = null;
+
+[Parameter]
+public bool ShowPageCounter
+{
+    get;
+    set;
+} = true;
+
 
 [Parameter]
 public string GroupSortField
