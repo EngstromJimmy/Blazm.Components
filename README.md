@@ -1,5 +1,7 @@
 # How to use Blazm
 
+<a href="https://www.nuget.org/packages/Blazm.Components/"><img src="https://img.shields.io/nuget/v/Blazm.Components"></a>
+
 I promised myself that I wouldn't build another component library.
 But for different reasons I had to build a Grid component (and some other components), and why not share that with others?
 So here it is, my component library.
