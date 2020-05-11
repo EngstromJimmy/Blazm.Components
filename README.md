@@ -63,7 +63,7 @@ This adds the necessary things for the grid to be responsive.
 2. After the script tag (towards the bottom of the page) referring to blazor.server.js.
 Add 
 ``` html 
-<script src="_content/Blazm.Components/scripts/jsinterop..min.js"></script>
+<script src="_content/Blazm.Components/scripts/jsinterop.min.js"></script>
 <script src="_content/BlazorPro.BlazorSize/blazorSize.min.js"></script>
 ```
 
