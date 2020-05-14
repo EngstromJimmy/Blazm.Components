@@ -11,7 +11,7 @@ Blazor + Azm == Blazm and it will make you site blazm (blossom).
 I know.. I like puns.
 
 
-##Components
+##  Components
 
 BlazmGrid
 
@@ -203,3 +203,18 @@ Priority 0 is the highest priority which means the column will always be visible
 It uses [BlazorPro.BlazorSize](https://github.com/EdCharbeneau/BlazorSize) by Ed Charbeneau to detect resize on the client.
 If a column is hidden, an icon will appear and the row will become expandable (to show the removed columns).
 The icon is customizable using ```ExpandTemplate``` and ```CollapseTemplate```
+
+### Command columns
+
+To add a column that is not connected to any field (like command buttons for example) just add a GridColumn without the Field-property.
+
+``` html
+<GridColumn>
+    <Template>
+        @{
+            var item = context as WeatherForecast;
+        }
+        <button class="btn btn-danger" @onclick="@(async () => { await Delete(item); })"><i class="far fa-trash-alt"></i></button>
+    </Template>
+</GridColumn>
+```
