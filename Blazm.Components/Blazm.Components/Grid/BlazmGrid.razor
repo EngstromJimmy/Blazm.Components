@@ -256,185 +256,188 @@
 
 @code
 {
-[Parameter]
-public string NextText { get; set; } = "Next";
+    [Parameter]
+    public string NextText { get; set; } = "Next";
 
-[Parameter]
-public string PreviousText { get; set; } = "Previous";
+    [Parameter]
+    public string PreviousText { get; set; } = "Previous";
 
-private async Task selectItemsAsync(List<TItem> items, object selected)
-{
-    foreach (var item in items)
+    private async Task selectItemsAsync(List<TItem> items, object selected)
+    {
+        foreach (var item in items)
+        {
+            if ((bool)selected)
+            {
+                if (!SelectedData.Contains(item))
+                {
+                    SelectedData.Add(item);
+                }
+            }
+            else
+            {
+                SelectedData.Remove(item);
+            }
+        }
+        await SelectedDataChanged.InvokeAsync(SelectedData);
+        StateHasChanged();
+    }
+
+    private async Task selectItemAsync(TItem item, object selected)
     {
         if ((bool)selected)
         {
-            if (!SelectedData.Contains(item))
-            {
-                SelectedData.Add(item);
-            }
+            SelectedData.Add(item);
         }
         else
         {
             SelectedData.Remove(item);
         }
+        await SelectedDataChanged.InvokeAsync(SelectedData);
+        StateHasChanged();
     }
-    await SelectedDataChanged.InvokeAsync(SelectedData);
-    StateHasChanged();
-}
 
-private async Task selectItemAsync(TItem item, object selected)
-{
-    if ((bool)selected)
+    private bool isItemSelected(TItem item)
     {
-        SelectedData.Add(item);
+        return SelectedData.Contains(item);
     }
-    else
+
+    [Parameter]
+    public EventCallback<List<TItem>> SelectedDataChanged { get; set; }
+
+    private string getSignClass(IGridColumn column, string value)
     {
-        SelectedData.Remove(item);
-    }
-    await SelectedDataChanged.InvokeAsync(SelectedData);
-    StateHasChanged();
-}
-
-private bool isItemSelected(TItem item)
-{
-    return SelectedData.Contains(item);
-}
-
-[Parameter]
-public EventCallback<List<TItem>> SelectedDataChanged { get; set; }
-
-private string getSignClass(IGridColumn column, string value)
-{
-    try
-    {
-        if (value.StartsWith("-"))
+        if (column.HighlightSign)
         {
-            return column.ValueNegativeClass;
+            try
+            {
+                if (value.StartsWith("-"))
+                {
+                    return column.ValueNegativeClass;
+                }
+                else
+                {
+                    var d = Convert.ToDouble(value);
+                    if (d == 0d)
+                    {
+                        return "";
+                    }
+                    else
+                    {
+                        return column.ValuePositiveClass;
+                    }
+                }
+            }
+            catch { }
         }
-        else
+        return "";
+    }
+
+    string id = Guid.NewGuid().ToString();
+    int ContainerClientWidth { get; set; }
+    int TableClientWidth { get; set; }
+    protected void SetPage(int pageNumber)
+    {
+        CurrentPage = pageNumber;
+    }
+
+    protected void PreviousPage()
+    {
+        if (CurrentPage > 0)
         {
-            var d = Convert.ToDouble(value);
-            if (d == 0d)
-            {
-                return "";
-            }
-            else
-            {
-                return column.ValuePositiveClass;
-            }
+            CurrentPage--;
         }
     }
-    catch { }
-    return "";
-}
 
-string id = Guid.NewGuid().ToString();
-int ContainerClientWidth { get; set; }
-int TableClientWidth { get; set; }
-protected void SetPage(int pageNumber)
-{
-    CurrentPage = pageNumber;
-}
-
-protected void PreviousPage()
-{
-    if (CurrentPage > 0)
+    protected void NextPage()
     {
-        CurrentPage--;
+        if ((CurrentPage * PageSize) + PageSize < Data.Count())
+        {
+            CurrentPage++;
+        }
     }
-}
-
-protected void NextPage()
-{
-    if ((CurrentPage * PageSize) + PageSize < Data.Count())
+    [Parameter]
+    public int PageSize
     {
-        CurrentPage++;
+        get;
+        set;
+    } = 0;
+
+    [Parameter]
+    public int CurrentPage
+    {
+        get;
+        set;
+    } = 0;
+
+    [Parameter]
+    public bool ShowCheckbox
+    {
+        get;
+        set;
+    } = false;
+
+    [Parameter]
+    public bool ShowGroupFooter
+    {
+        get;
+        set;
+    } = false;
+
+    [Parameter]
+    public bool ShowFooter
+    {
+        get;
+        set;
+    } = false;
+
+    [Parameter]
+    public bool Sortable
+    {
+        get;
+        set;
+    } = false;
+
+    [Parameter]
+    public string SortField
+    {
+        get;
+        set;
+    } = null;
+
+    [Parameter]
+    public bool ShowPageCounter
+    {
+        get;
+        set;
+    } = true;
+
+
+    [Parameter]
+    public string GroupSortField
+    {
+        get;
+        set;
+    } = null;
+
+    [Parameter]
+    public System.ComponentModel.ListSortDirection SortDirection
+    {
+        get; set;
+    } = System.ComponentModel.ListSortDirection.Ascending;
+
+    [Parameter]
+    public RenderFragment GridColumns
+    {
+        get;
+        set;
     }
-}
-[Parameter]
-public int PageSize
-{
-    get;
-    set;
-} = 0;
 
-[Parameter]
-public int CurrentPage
-{
-    get;
-    set;
-} = 0;
-
-[Parameter]
-public bool ShowCheckbox
-{
-    get;
-    set;
-} = false;
-
-[Parameter]
-public bool ShowGroupFooter
-{
-    get;
-    set;
-} = false;
-
-[Parameter]
-public bool ShowFooter
-{
-    get;
-    set;
-} = false;
-
-[Parameter]
-public bool Sortable
-{
-    get;
-    set;
-} = false;
-
-[Parameter]
-public string SortField
-{
-    get;
-    set;
-} = null;
-
-[Parameter]
-public bool ShowPageCounter
-{
-    get;
-    set;
-} = true;
-
-
-[Parameter]
-public string GroupSortField
-{
-    get;
-    set;
-} = null;
-
-[Parameter]
-public System.ComponentModel.ListSortDirection SortDirection
-{
-    get; set;
-} = System.ComponentModel.ListSortDirection.Ascending;
-
-[Parameter]
-public RenderFragment GridColumns
-{
-    get;
-    set;
-}
-
-[Parameter]
-public RenderFragment CollapsedTemplate
-{
-    get;
-    set;
-} = @<i class="fas fa-greater-than"></i>;
+    [Parameter]
+    public RenderFragment CollapsedTemplate
+    {
+        get;
+        set;
+    } = @<i class="fas fa-greater-than"></i>;
 
 
 [Parameter]
@@ -474,6 +477,9 @@ set;
     private List<int> ExpandedRows = new List<int>();
     void IGridContainer.AddColumn(IGridColumn column)
     {
+
+        column.Id = column.Field + column.Template?.GetHashCode() + column.Format?.GetHashCode() ;
+
         var col = Columns.FirstOrDefault(c => c.Id == column.Id);
         column.Type = typeof(TItem);
         if (col == null)

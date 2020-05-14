@@ -22,14 +22,6 @@ else
     <h2>BlazmGrid - Data Column</h2>
     <BlazmGrid Data="forecasts" PageSize="10" Sortable="true" SortField="@nameof(WeatherForecast.Date)" ShowFooter="true">
         <GridColumns>
-            <GridColumn>
-                <Template>
-                    @{
-                        var item = context as WeatherForecast;
-                    }
-                    <div @onclick="@(async () => { await Load(item.Date); })">Reload</div>
-                </Template>
-            </GridColumn>
             <GridColumn Field="@nameof(WeatherForecast.Date)" Format="{0:d}" Priority="3" />
             <GridColumn Field="@nameof(WeatherForecast.TemperatureC)" HighlightSign="true" Priority="1" Class="alignRight">
                 <FooterTemplate>
@@ -48,20 +40,34 @@ else
                 </FooterTemplate>
             </GridColumn>
             <GridColumn Field="@nameof(WeatherForecast.Summary)" Priority="0" />
+            <GridColumn>
+                <Template>
+                    @{
+                        var item = context as WeatherForecast;
+                    }
+                    <button class="btn btn-danger" @onclick="@(async () => { await Delete(item); })"><i class="far fa-trash-alt"></i></button>
+                </Template>
+            </GridColumn>
         </GridColumns>
+
     </BlazmGrid>
 }
 
 @code {
-    private WeatherForecast[] forecasts;
+    private List<WeatherForecast> forecasts;
 
     protected override async Task OnInitializedAsync()
     {
         await Load();
     }
 
+    protected async Task Delete(WeatherForecast item)
+    {
+        forecasts.Remove(item);
+    }
+
     protected async Task Load(DateTime? date = null)
     {
-        forecasts = await ForecastService.GetForecastAsync(date ?? DateTime.Now);
+        forecasts = (await ForecastService.GetForecastAsync(date ?? DateTime.Now)).ToList();
     }
 }

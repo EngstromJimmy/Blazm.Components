@@ -5,9 +5,10 @@ namespace Blazm.Components
 {
     public interface IGridColumn
     {
-        Guid Id
+        string Id
         {
             get;
+            set;
         }
 
         int Priority
