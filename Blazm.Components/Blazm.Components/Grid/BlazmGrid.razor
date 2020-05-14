@@ -474,7 +474,7 @@ set;
     private List<int> ExpandedRows = new List<int>();
     void IGridContainer.AddColumn(IGridColumn column)
     {
-        var col = Columns.FirstOrDefault(c => c.Field == column.Field);
+        var col = Columns.FirstOrDefault(c => c.Id == column.Id);
         column.Type = typeof(TItem);
         if (col == null)
         {
@@ -492,7 +492,7 @@ set;
         {
             if (Sortable)
             {
-                if (SortField == column.Field)
+                if (SortField == column.Field && column.CanSort)
                 {
                     if (SortDirection == ListSortDirection.Descending)
                     {
@@ -538,7 +538,7 @@ set;
             {
                 break;
             }
-            foreach (var col in AllColumns.Where(a => a.Field == c.Field))
+            foreach (var col in AllColumns.Where(a => a.Id == c.Id))
             {
                 //update all references (needed if grouped)
                 col.Visible = false;

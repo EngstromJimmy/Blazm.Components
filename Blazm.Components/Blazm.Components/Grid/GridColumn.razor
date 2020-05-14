@@ -1,7 +1,7 @@
 ﻿@namespace Blazm.Components
 @implements IGridColumn
 
-<th @onclick="@(()=>ContainerGrid?.Sort(this))" class="@Class @HeaderClass @(ContainerGrid.Sortable?"cursor-pointer":"")">@Title <span class="fa @(GetSortStyle(this.Field))"></span></th>
+<th @onclick="@SortColumn" class="@Class @HeaderClass @(ContainerGrid.Sortable && CanSort ? "cursor-pointer" : "")">@Title @if (CanSort) {<span class="fa @(GetSortStyle(this.Field))"></span>}</th>
 
 @code {
 
@@ -45,6 +45,18 @@
         get;
         set;
     } = false;
+
+    private void SortColumn()
+    {
+        if (CanSort)
+        {
+            ContainerGrid?.Sort(this);
+        }
+    }
+
+    private Guid id = Guid.NewGuid();
+
+    public Guid Id { get { return id; } }
 
     public bool Visible
     {
@@ -169,6 +181,11 @@
     {
         this.ContainerGrid.AddColumn(this);
         base.OnInitialized();
+    }
+
+    public bool CanSort
+    {
+        get { return Field != null; }
     }
 
     private string GetSortStyle(string columnName)
