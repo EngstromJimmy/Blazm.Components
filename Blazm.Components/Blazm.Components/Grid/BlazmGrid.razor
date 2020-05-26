@@ -292,11 +292,11 @@
 
                 if (column.Format == null)
                 {
-                    stringValue = r.GetType().GetProperty(column.Field).GetValue(r).ToString();
+                    stringValue = r.GetType().GetProperty(column.Field).GetValue(r)?.ToString();
                 }
                 else
                 {
-                    stringValue = string.Format(column.Format, r.GetType().GetProperty(column.Field)?.GetValue(r).ToString());
+                    stringValue = string.Format(column.Format, r.GetType().GetProperty(column.Field)?.GetValue(r)?.ToString());
                 }
 
                 switch (r.GetType().GetProperty(column.Field).PropertyType.Name)

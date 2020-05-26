@@ -11,6 +11,7 @@
     <RepositoryUrl>https://github.com/EngstromJimmy/Blazm.Components</RepositoryUrl>
     <PackageTags>Blazor</PackageTags>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+    <PackageLicenseExpression>Apache-2.0</PackageLicenseExpression>
   </PropertyGroup>
 
   <ItemGroup>
