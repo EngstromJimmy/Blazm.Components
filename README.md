@@ -218,3 +218,21 @@ To add a column that is not connected to any field (like command buttons for exa
     </Template>
 </GridColumn>
 ```
+
+### Export to Excel
+
+The build-in support for exporting data to Excel will not us templated columns (it will render the value not the template).
+All columns will be exported by default.
+Add ```Exportable=false``` to exclude columns from the export.
+
+``` html
+<button class="btn btn-success" @onclick="@(async ()=> { await MyGrid.ExportDataAsync("Weather.xlsx","Export","yyyy-mm-dd"); })">Export data to Excel</button>
+    
+<BlazmGrid @ref="MyGrid" .......>
+//Code removed for brevity
+
+```
+and in the code section add
+``` csharp
+private BlazmGrid<WeatherForecast> MyGrid;
+```

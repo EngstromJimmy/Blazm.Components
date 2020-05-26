@@ -11,6 +11,12 @@ namespace Blazm.Components
             set;
         }
 
+        bool Exportable
+        {
+            get;
+            set;
+        }
+            
         int Priority
         {
             get;

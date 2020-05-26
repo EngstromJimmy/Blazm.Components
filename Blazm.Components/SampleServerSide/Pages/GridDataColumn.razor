@@ -20,7 +20,8 @@
 else
 {
     <h2>BlazmGrid - Data Column</h2>
-    <BlazmGrid Data="forecasts" PageSize="10" Sortable="true" SortField="@nameof(WeatherForecast.Date)" ShowFooter="true">
+    <button class="btn btn-success" @onclick="@(async ()=> { await MyGrid.ExportDataAsync("Weather.xlsx","Export","yyyy-mm-dd"); })">Export data to Excel</button>
+    <BlazmGrid @ref="MyGrid" Data="forecasts" PageSize="10" Sortable="true" SortField="@nameof(WeatherForecast.Date)" ShowFooter="true">
         <GridColumns>
             <GridColumn Field="@nameof(WeatherForecast.Date)" Format="{0:d}" Priority="3" />
             <GridColumn Field="@nameof(WeatherForecast.TemperatureC)" HighlightSign="true" Priority="1" Class="alignRight">
@@ -40,7 +41,7 @@ else
                 </FooterTemplate>
             </GridColumn>
             <GridColumn Field="@nameof(WeatherForecast.Summary)" Priority="0" />
-            <GridColumn>
+            <GridColumn Exportable="false">
                 <Template>
                     @{
                         var item = context as WeatherForecast;
@@ -55,6 +56,7 @@ else
 
 @code {
     private List<WeatherForecast> forecasts;
+    private BlazmGrid<WeatherForecast> MyGrid;
 
     protected override async Task OnInitializedAsync()
     {

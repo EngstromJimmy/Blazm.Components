@@ -1,6 +1,8 @@
 ﻿@namespace Blazm.Components
 @typeparam TItem
-
+@using NPOI.SS.UserModel
+@using NPOI.XSSF.UserModel
+@using System.IO
 @implements IGridContainer
 @implements IDisposable
 @inject ResizeListener listener
@@ -55,22 +57,22 @@
                             @if (Columns.Any(c => !c.Visible) || ShowCheckbox)
                             {
                                 <td>
-                                @if (Columns.Any(c => !c.Visible))
-                                {
-                            
-                                    if(ExpandedRows.Contains(row.GetHashCode()))
+                                    @if (Columns.Any(c => !c.Visible))
                                     {
-                                        @ExpandedTemplate
+
+                                        if (ExpandedRows.Contains(row.GetHashCode()))
+                                        {
+                                            @ExpandedTemplate
+                                        }
+                                        else
+                                        {
+                                            @CollapsedTemplate
+                                        }
                                     }
-                                    else
+                                    @if (ShowCheckbox)
                                     {
-                                        @CollapsedTemplate
+                                        <input type="checkbox" checked="@(isItemSelected(row))" @onchange="async eventArgs => { await selectItemAsync(row, eventArgs.Value); }" />
                                     }
-                                }
-                                @if (ShowCheckbox)
-                                {
-                                    <input type="checkbox" checked="@(isItemSelected(row))" @onchange="async eventArgs => { await selectItemAsync(row, eventArgs.Value); }" />
-                                }
                                 </td>
                             }
                             @foreach (var column in Columns)
@@ -116,20 +118,20 @@
                         {
                             <tr class="headerrow"><td colspan="@(Columns.Where(c => c.Visible).Count() + (ShowCheckbox?1:0) + (Columns.Any(c => c.Visible==false)?1:0))"> @GroupHeader(d.Key)</td></tr>
                         }
-                    <tr>
-                        @if (ShowCheckbox || Columns.Any(c => !c.Visible))
-                        {
-                            <th>
-                                @if (ShowCheckbox)
-                                {
-                                    <input type="checkbox" @onchange="async eventArgs => { await selectItemsAsync(d.ToList(), eventArgs.Value); }" /> 
-                                }
-                            </th>
-                        }
-                        <CascadingValue Value="@this">
-                            @GridColumns
-                        </CascadingValue>
-                    </tr>
+                        <tr>
+                            @if (ShowCheckbox || Columns.Any(c => !c.Visible))
+                            {
+                                <th>
+                                    @if (ShowCheckbox)
+                                    {
+                                        <input type="checkbox" @onchange="async eventArgs => { await selectItemsAsync(d.ToList(), eventArgs.Value); }" />
+                                    }
+                                </th>
+                            }
+                            <CascadingValue Value="@this">
+                                @GridColumns
+                            </CascadingValue>
+                        </tr>
                         @{
                             var groupData = d.ToList();
                             if (SortField != null)
@@ -148,50 +150,50 @@
 
                         @foreach (var row in groupData)
                         {
-                    <tr class="@(Columns.Any(c => !c.Visible) ? "expandable" : "")" @onclick="@(() => { if (ExpandedRows.Contains(row.GetHashCode())) { ExpandedRows.Remove(row.GetHashCode()); } else { ExpandedRows.Add(row.GetHashCode()); } })">
-                        @if (Columns.Any(c => !c.Visible) || ShowCheckbox)
-                        {
-                            <td>
-                                @if (Columns.Any(c => !c.Visible))
+                            <tr class="@(Columns.Any(c => !c.Visible) ? "expandable" : "")" @onclick="@(() => { if (ExpandedRows.Contains(row.GetHashCode())) { ExpandedRows.Remove(row.GetHashCode()); } else { ExpandedRows.Add(row.GetHashCode()); } })">
+                                @if (Columns.Any(c => !c.Visible) || ShowCheckbox)
                                 {
+                                    <td>
+                                        @if (Columns.Any(c => !c.Visible))
+                                        {
 
-                                    if (ExpandedRows.Contains(row.GetHashCode()))
+                                            if (ExpandedRows.Contains(row.GetHashCode()))
+                                            {
+                                                @ExpandedTemplate
+                                            }
+                                            else
+                                            {
+                                                @CollapsedTemplate
+                                            }
+                                        }
+                                        @if (ShowCheckbox)
+                                        {
+                                            <input type="checkbox" checked="@(isItemSelected(row))" @onchange="async eventArgs => { await selectItemAsync(row, eventArgs.Value); }" />
+                                        }
+                                    </td>
+                                }
+                                @foreach (var column in Columns)
+                                {
+                                    if (column.Template == null)
                                     {
-                                        @ExpandedTemplate
+                                        string stringValue = "";
+
+                                        if (column.Format == null)
+                                        {
+                                            stringValue = row.GetType().GetProperty(column.Field).GetValue(row)?.ToString();
+                                        }
+                                        else
+                                        {
+                                            stringValue = string.Format(column.Format, row.GetType().GetProperty(column.Field)?.GetValue(row));
+                                        }
+                                        <td class="@column.Class  @getSignClass(column,stringValue) @column.DataClass">@stringValue</td>
                                     }
                                     else
                                     {
-                                        @CollapsedTemplate
+                                        <td class="@column.Class @column.DataClass">@column.Template(row)</td>
                                     }
                                 }
-                                @if (ShowCheckbox)
-                                {
-                                    <input type="checkbox" checked="@(isItemSelected(row))" @onchange="async eventArgs => { await selectItemAsync(row, eventArgs.Value); }" />
-                                }
-                            </td>
-                        }
-                        @foreach (var column in Columns)
-                        {
-                            if (column.Template == null)
-                            {
-                                string stringValue = "";
-
-                                if (column.Format == null)
-                                {
-                                    stringValue = row.GetType().GetProperty(column.Field).GetValue(row)?.ToString();
-                                }
-                                else
-                                {
-                                    stringValue = string.Format(column.Format, row.GetType().GetProperty(column.Field)?.GetValue(row));
-                                }
-                                <td class="@column.Class  @getSignClass(column,stringValue) @column.DataClass">@stringValue</td>
-                            }
-                            else
-                            {
-                                <td class="@column.Class @column.DataClass">@column.Template(row)</td>
-                            }
-                        }
-                    </tr>
+                            </tr>
                             <HiddenRows Columns="@Columns" ExpandedRows="@ExpandedRows" ShowCheckbox="@ShowCheckbox" Row="@row"></HiddenRows>
                         }
                     </tbody>
@@ -233,7 +235,7 @@
             </tfoot>
         }
     </table>
-    @if (PageSize != 0 && Data.Count() > PageSize && GroupBy==null)
+    @if (PageSize != 0 && Data.Count() > PageSize && GroupBy == null)
     {
 
         <ul class="pagination">
@@ -256,6 +258,87 @@
 
 @code
 {
+    public async Task ExportDataAsync(string filename,string sheetname="sheet1", string dateformat= "MM/dd/yyyy HH:mm:ss")
+    {
+
+        IWorkbook workbook = new XSSFWorkbook();
+
+        var newDataFormat = workbook.CreateDataFormat();
+        var datestyle = workbook.CreateCellStyle();
+        datestyle.DataFormat = newDataFormat.GetFormat(dateformat);
+
+        ISheet worksheet = workbook.CreateSheet(sheetname);
+
+        int rownum = 0;
+
+        IRow hrow = worksheet.CreateRow(rownum++);
+        int cellnumber = 0;
+        foreach (var c in Columns.Where(d=>d.Exportable))
+        {
+            ICell Cell = hrow.CreateCell(cellnumber++);
+            Cell.SetCellValue(c.Title);
+        }
+
+
+        foreach (var r in Data)
+        {
+            IRow row = worksheet.CreateRow(rownum++);
+            cellnumber = 0;
+            foreach (var column in Columns.Where(d => d.Exportable))
+            {
+                ICell Cell = row.CreateCell(cellnumber++);
+
+                string stringValue = "";
+
+                if (column.Format == null)
+                {
+                    stringValue = r.GetType().GetProperty(column.Field).GetValue(r).ToString();
+                }
+                else
+                {
+                    stringValue = string.Format(column.Format, r.GetType().GetProperty(column.Field)?.GetValue(r).ToString());
+                }
+
+                switch (r.GetType().GetProperty(column.Field).PropertyType.Name)
+                {
+
+                    case "Int32":
+                    case "Int64":
+                    case "Int16":
+                    case "Decimal":
+                    case "Double":
+                        Cell.SetCellValue(Convert.ToDouble(stringValue));
+                        break;
+                    case "DateTime":
+                        Cell.CellStyle = datestyle;
+                        Cell.SetCellValue(Convert.ToDateTime(stringValue));
+                        break;
+                    default:
+                        Cell.SetCellValue(stringValue);
+                        break;
+                }
+            }
+        }
+
+        //for (int rownum = 0; rownum < 10000; rownum++)
+        //{
+        //    IRow row = worksheet.CreateRow(rownum);
+        //    for (int celnum = 0; celnum < 20; celnum++)
+        //    {
+        //        ICell Cell = row.CreateCell(celnum);
+        //        Cell.SetCellValue("Cell: Row-" + rownum + ";CellNo:" + celnum);
+        //    }
+        //}
+
+        MemoryStream ms = new MemoryStream();
+        workbook.Write(ms);
+        byte[] bytes = ms.ToArray();
+        ms.Close();
+
+        await jsruntime.SaveAsFileAsync(filename, bytes, "application/vnd.ms-excel");
+    }
+
+
     [Parameter]
     public string NextText { get; set; } = "Next";
 
@@ -447,151 +530,151 @@ get;
 set;
 } = @<i class="fas fa-greater-than fa-rotate-90"></i>;
 
-    [Parameter]
-    public RenderFragment<object> GroupHeader
-    {
-        get;
-        set;
-    }
+[Parameter]
+public RenderFragment<object> GroupHeader
+{
+get;
+set;
+}
 
 
-    [Parameter]
-    public Func<TItem, object> GroupBy { get; set; } = null;
+[Parameter]
+public Func<TItem, object> GroupBy { get; set; } = null;
 
-    [Parameter]
-    public IEnumerable<TItem> Data
-    {
-        get;
-        set;
-    }
+[Parameter]
+public IEnumerable<TItem> Data
+{
+get;
+set;
+}
 
-    [Parameter]
-    public List<TItem> SelectedData
-    {
-        get;
-        set;
-    } = new List<TItem>();
+[Parameter]
+public List<TItem> SelectedData
+{
+get;
+set;
+} = new List<TItem>();
 
-    private List<IGridColumn> Columns { get; set; } = new List<IGridColumn>();
-    private List<IGridColumn> AllColumns { get; set; } = new List<IGridColumn>();
-    private List<int> ExpandedRows = new List<int>();
-    void IGridContainer.AddColumn(IGridColumn column)
-    {
+private List<IGridColumn> Columns { get; set; } = new List<IGridColumn>();
+private List<IGridColumn> AllColumns { get; set; } = new List<IGridColumn>();
+private List<int> ExpandedRows = new List<int>();
+void IGridContainer.AddColumn(IGridColumn column)
+{
 
-        column.Id = column.Field + column.Template?.GetHashCode() + column.Format?.GetHashCode() ;
+column.Id = column.Field + column.Template?.GetHashCode() + column.Format?.GetHashCode();
 
-        var col = Columns.FirstOrDefault(c => c.Id == column.Id);
-        column.Type = typeof(TItem);
-        if (col == null)
-        {
-            Columns.Add(column);
-        }
-        //If the grid is grouped we need access to all columns (one set per group)
-        AllColumns.Add(column);
+var col = Columns.FirstOrDefault(c => c.Id == column.Id);
+column.Type = typeof(TItem);
+if (col == null)
+{
+Columns.Add(column);
+}
+//If the grid is grouped we need access to all columns (one set per group)
+AllColumns.Add(column);
 
-        StateHasChanged();
-    }
+StateHasChanged();
+}
 
-    Task IGridContainer.Sort(IGridColumn column)
-    {
-        return InvokeAsync(() =>
-        {
-            if (Sortable)
-            {
-                if (SortField == column.Field && column.CanSort)
-                {
-                    if (SortDirection == ListSortDirection.Descending)
-                    {
-                        SortDirection = ListSortDirection.Ascending;
-                    }
-                    else
-                    {
-                        SortDirection = ListSortDirection.Descending;
-                    }
-                }
-                else
-                {
-                    SortField = column.Field;
-                }
-                StateHasChanged();
-            }
-        });
-    }
+Task IGridContainer.Sort(IGridColumn column)
+{
+return InvokeAsync(() =>
+{
+if (Sortable)
+{
+if (SortField == column.Field && column.CanSort)
+{
+if (SortDirection == ListSortDirection.Descending)
+{
+SortDirection = ListSortDirection.Ascending;
+}
+else
+{
+SortDirection = ListSortDirection.Descending;
+}
+}
+else
+{
+SortField = column.Field;
+}
+StateHasChanged();
+}
+});
+}
 
-    void IGridContainer.RemoveColumn(IGridColumn column)
-    {
-        Columns.Remove(column);
-    }
+void IGridContainer.RemoveColumn(IGridColumn column)
+{
+Columns.Remove(column);
+}
 
-    protected async override Task OnAfterRenderAsync(bool firstRender)
-    {
-        if (firstRender)
-        {
-            listener.OnResized += WindowResized;
-        }
-        await base.OnAfterRenderAsync(firstRender);
-    }
+protected async override Task OnAfterRenderAsync(bool firstRender)
+{
+if (firstRender)
+{
+listener.OnResized += WindowResized;
+}
+await base.OnAfterRenderAsync(firstRender);
+}
 
 #pragma warning disable 1998
-    private async Task resizeTableAsync()
-    {
-        int reduceby = 0;
-        Columns.ForEach((c) => c.Visible = true);
+private async Task resizeTableAsync()
+{
+int reduceby = 0;
+Columns.ForEach((c) => c.Visible = true);
 
-        foreach (var c in Columns.Where(c => c.Priority > 0).OrderByDescending(c => c.Priority))
-        {
-            if (TableClientWidth - reduceby <= ContainerClientWidth)
-            {
-                break;
-            }
-            foreach (var col in AllColumns.Where(a => a.Id == c.Id))
-            {
-                //update all references (needed if grouped)
-                col.Visible = false;
-            }
-            reduceby += c.ClientWidth;
-        }
+foreach (var c in Columns.Where(c => c.Priority > 0).OrderByDescending(c => c.Priority))
+{
+if (TableClientWidth - reduceby <= ContainerClientWidth)
+{
+break;
+}
+foreach (var col in AllColumns.Where(a => a.Id == c.Id))
+{
+//update all references (needed if grouped)
+col.Visible = false;
+}
+reduceby += c.ClientWidth;
+}
 
-        StateHasChanged();
-    }
+StateHasChanged();
+}
 #pragma warning restore 1998
 
 
-    void IDisposable.Dispose()
-    {
-        listener.OnResized -= WindowResized;
-    }
+void IDisposable.Dispose()
+{
+listener.OnResized -= WindowResized;
+}
 
-    async void WindowResized(object _, BrowserWindowSize window)
-    {
-        var size = await jsruntime.InvokeAsync<TableSize>("resizeTable", id, GroupBy != null);
-        for (var i = 0; i < size?.Columns?.Length; i++)
-        {
-            var counter = i;
-            if (ShowCheckbox || Columns.Any(c => !c.Visible))
-            {
-                //Skip the first one
-                counter = i - 1;
-                if (i == 0)
-                {
-                    continue;
-                }
-            }
-            Columns[counter].ClientWidth = size.Columns[counter];
-        }
-        TableClientWidth = size.TableClientWidth;
-        ContainerClientWidth = size.ContainerClientWidth;
+async void WindowResized(object _, BrowserWindowSize window)
+{
+var size = await jsruntime.InvokeAsync<TableSize>("resizeTable", id, GroupBy != null);
+for (var i = 0; i < size?.Columns?.Length; i++)
+{
+var counter = i;
+if (ShowCheckbox || Columns.Any(c => !c.Visible))
+{
+//Skip the first one
+counter = i - 1;
+if (i == 0)
+{
+continue;
+}
+}
+Columns[counter].ClientWidth = size.Columns[counter];
+}
+TableClientWidth = size.TableClientWidth;
+ContainerClientWidth = size.ContainerClientWidth;
 
-        await resizeTableAsync();
+await resizeTableAsync();
 
-        StateHasChanged();
-    }
+StateHasChanged();
+}
 
-    class TableSize
-    {
-        public int[] Columns { get; set; }
-        public int TableClientWidth { get; set; }
-        public int ContainerClientWidth { get; set; }
-    }
+class TableSize
+{
+public int[] Columns { get; set; }
+public int TableClientWidth { get; set; }
+public int ContainerClientWidth { get; set; }
+}
 
 }

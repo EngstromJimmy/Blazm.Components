@@ -44,7 +44,8 @@ else
     </BlazmGrid>
 
     <h2>BlazmGrid grouped</h2>
-    <BlazmGrid GroupBy="d=>d.Summary" Data="forecasts.Take(20)" PageSize="10" Sortable="true" SortField="@nameof(WeatherForecast.Date)" ShowFooter="true" ShowGroupFooter="true" >
+    <button class="btn btn-success" @onclick="@(async ()=> { await GroupedGrid.ExportDataAsync("Weather.xlsx","Export","yyyy-mm-dd"); })">Export data to Excel</button>
+    <BlazmGrid @ref="GroupedGrid" GroupBy="d=>d.Summary" Data="forecasts.Take(20)" PageSize="10" Sortable="true" SortField="@nameof(WeatherForecast.Date)" ShowFooter="true" ShowGroupFooter="true">
         <GroupHeader>
             <h5>@context</h5>
         </GroupHeader>
@@ -59,7 +60,7 @@ else
                 </FooterTemplate>
 
                 <GroupFooterTemplate>
-                    @{  //Context contains all the WeatherForecast within the group
+                    @{ //Context contains all the WeatherForecast within the group
                         var temp = context as List<WeatherForecast>;
                     }
                     @temp.Sum(t => t.TemperatureC)
@@ -68,7 +69,7 @@ else
             <GridColumn Field="@nameof(WeatherForecast.TemperatureF)" Priority="2" Class="alignRight">
                 <FooterTemplate>
                     @{
-                        var temp = context as List<WeatherForecast>;
+                            var temp = context as List<WeatherForecast>;
                     }
                     @temp.Sum(t => t.TemperatureF)
                 </FooterTemplate>
@@ -103,7 +104,7 @@ else
 
 @code {
     private WeatherForecast[] forecasts;
-
+    private BlazmGrid<WeatherForecast> GroupedGrid;
     protected override async Task OnInitializedAsync()
     {
         forecasts = await ForecastService.GetForecastAsync(DateTime.Now);

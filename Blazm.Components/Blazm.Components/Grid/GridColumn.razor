@@ -5,57 +5,57 @@
 
 @code {
 
-        [CascadingParameter]
-        private IGridContainer ContainerGrid { get; set; }
+    [CascadingParameter]
+    private IGridContainer ContainerGrid { get; set; }
 
 
-        [Parameter]
-        public string Width
+    [Parameter]
+    public string Width
+    {
+        get;
+        set;
+    }
+
+    [Parameter]
+    public int Priority
+    {
+        get;
+        set;
+    } = 0;
+
+    private string _Headerclass = "";
+    [Parameter]
+    public string HeaderClass
+    {
+        get { return _Headerclass; }
+        set { _Headerclass = value; }
+    }
+
+    private string _class = "";
+    [Parameter]
+    public string Class
+    {
+        get { return _class + " " + (Visible ? "" : "hiddencell"); ; }
+        set { _class = value; }
+    }
+
+    [Parameter]
+    public bool HighlightSign
+    {
+        get;
+        set;
+    } = false;
+
+    private void SortColumn()
+    {
+        if (CanSort)
         {
-            get;
-            set;
+            ContainerGrid?.Sort(this);
         }
+    }
 
-        [Parameter]
-        public int Priority
-        {
-            get;
-            set;
-        } = 0;
 
-        private string _Headerclass = "";
-        [Parameter]
-        public string HeaderClass
-        {
-            get { return _Headerclass; }
-            set { _Headerclass = value; }
-        }
-
-        private string _class = "";
-        [Parameter]
-        public string Class
-        {
-            get { return _class + " " + (Visible ? "" : "hiddencell"); ; }
-            set { _class = value; }
-        }
-
-        [Parameter]
-        public bool HighlightSign
-        {
-            get;
-            set;
-        } = false;
-
-        private void SortColumn()
-        {
-            if (CanSort)
-            {
-                ContainerGrid?.Sort(this);
-            }
-        }
-
-    
-    [Parameter] 
+    [Parameter]
     public string Id { get;set; }
 
     public bool Visible
@@ -167,7 +167,12 @@
         set;
     }
 
-
+    [Parameter]
+    public bool Exportable
+    {
+        get;
+        set;
+    } = true;
 
     [Parameter]
     public RenderFragment<object> GroupFooterTemplate
