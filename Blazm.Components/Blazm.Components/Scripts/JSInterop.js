@@ -9,19 +9,24 @@ function resizeTable(id, isGrouped) {
         row = 1;
     }
 
-    //Make all columns "visible" to be able to check their client width so we can recalculate which columns that should be visible
-    table.classList.add("countableClientWidth");
+    if (container != null && table != null && table.rows.length > row + 1) {
+        //Make all columns "visible" to be able to check their client width so we can recalculate which columns that should be visible
+        table.classList.add("countableClientWidth");
 
-    var celloffsets = Array.from(table.rows[row].cells).map(c => c.offsetWidth);
-    var tablewidth = table.clientWidth;
+        var celloffsets = Array.from(table.rows[row].cells).map(c => c.offsetWidth);
+        var tablewidth = table.clientWidth;
 
-    table.classList.remove("countableClientWidth");
+        table.classList.remove("countableClientWidth");
 
 
-    return {
-        tableClientWidth: tablewidth,
-        containerClientWidth: container.clientWidth,
-        columns: celloffsets
+        return {
+            tableClientWidth: tablewidth,
+            containerClientWidth: container.clientWidth,
+            columns: celloffsets
+        }
+    }
+    else {
+        return null;
     }
 }
 

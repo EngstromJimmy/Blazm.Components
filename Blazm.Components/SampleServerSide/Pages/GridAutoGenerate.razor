@@ -1,0 +1,40 @@
+﻿@page "/gridautogenerate"
+@using Blazm.Components
+@using SampleServerSide.Data
+@inject WeatherForecastService ForecastService
+
+<style>
+    th {
+        white-space: nowrap;
+    }
+</style>
+
+<h1>Weather forecast</h1>
+
+<p>This component demonstrates fetching data from a service.</p>
+
+@if (forecasts == null)
+{
+    <p><em>Loading...</em></p>
+}
+else
+{
+    <h2>BlazmGrid - Auto generate columns</h2>
+    <BlazmGrid Data="forecasts" PageSize="10" AutoGenerateColumns="true">
+
+    </BlazmGrid>
+}
+
+@code {
+    private WeatherForecast[] forecasts;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await Load();
+    }
+
+    protected async Task Load(DateTime? date = null)
+    {
+        forecasts = await ForecastService.GetForecastAsync(date ?? DateTime.Now);
+    }
+}

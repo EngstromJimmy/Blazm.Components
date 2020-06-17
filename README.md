@@ -236,3 +236,13 @@ and in the code section add
 ``` csharp
 private BlazmGrid<WeatherForecast> MyGrid;
 ```
+
+### Auto generate columns
+
+If you want to auto generate columns you can do that by setting ```AutoGenerateColumns="true"```
+The grid will then create columns for all the properties on your data object.
+
+``` html
+<BlazmGrid Data="forecasts" AutoGenerateColumns="true">
+</BlazmGrid>
+```
