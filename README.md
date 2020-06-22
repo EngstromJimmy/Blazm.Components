@@ -246,3 +246,8 @@ The grid will then create columns for all the properties on your data object.
 <BlazmGrid Data="forecasts" AutoGenerateColumns="true">
 </BlazmGrid>
 ```
+
+### dynamic
+
+You can use dynamic (ExpandoObject) with the grid.
+If you for example have a DataTable, convert it to dynamic and it will work with the grid.

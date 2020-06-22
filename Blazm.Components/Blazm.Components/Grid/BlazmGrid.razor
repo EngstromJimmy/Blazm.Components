@@ -14,7 +14,7 @@
     <table class="table table-striped" id="@("table" + id)">
 
         @{ 
-            var firstRow = Data.First();
+            var firstRow = Data.FirstOrDefault();
             if (AutoGenerateColumns && Data != null && Data.Any())
             {
                 //Check if type is expandoObject
