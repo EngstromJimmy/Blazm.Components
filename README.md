@@ -153,6 +153,14 @@ Will sum ALL the double-fields in the entire table.
 </GridColumn>
 ```
 
+### Empty Grid Template
+By supplying an ```EmptyGridTemplate``` you can specify if there should be any text shown it the grid is empty.
+``` html
+<EmptyGridTemplate>
+    No data found
+</EmptyGridTemplate>
+```
+
 ## Column features
 
 ### Column header
