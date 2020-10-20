@@ -11,6 +11,8 @@ Blazor + Azm == Blazm and it will make you site blazm (blossom).
 I know.. I like puns.
 
 
+![Blazm](Blazm.gif)
+
 ##  Components
 
 BlazmGrid
