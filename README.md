@@ -31,7 +31,8 @@ BlazmGrid
 
 
 ## Sponsors
-Thanks you to much to my sponsors!
+Thanks you to much to my sponsors!  
+![](https://raw.githubusercontent.com/EngstromJimmy/Blazm.Components/master/TelerikRect.png)
 Telerik UI for Blazor – Increase productivity and cut cost in half! Use the Telerik truly native Blazor UI components to cover any app scenario. [Give it a try.](https://www.telerik.com/campaigns/blazor/free-trial-1?utm_source=jimmyengstrom&utm_medium=cpm&utm_campaign=blazor-trial-github-blazmcomp-sponsored-message)
 
 
