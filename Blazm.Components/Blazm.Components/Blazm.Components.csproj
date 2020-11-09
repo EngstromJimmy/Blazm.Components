@@ -1,9 +1,9 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk.Razor">
 
   <PropertyGroup>
-    <TargetFramework>netstandard2.1</TargetFramework>
-    <RazorLangVersion>3.0</RazorLangVersion>
-    <LangVersion>8</LangVersion>
+    <TargetFramework>net5.0</TargetFramework>
+    <RazorLangVersion>5.0</RazorLangVersion>
+    <LangVersion>9</LangVersion>
     <Authors>Jimmy Engström</Authors>
     <Description>A collection of Blazor components</Description>
     <Version>0.0.12</Version>
@@ -25,8 +25,8 @@
 
   <ItemGroup>
     <PackageReference Include="BlazorPro.BlazorSize" Version="2.0.2" />
-    <PackageReference Include="Microsoft.AspNetCore.Components" Version="3.1.4" />
-    <PackageReference Include="Microsoft.AspNetCore.Components.Web" Version="3.1.4" />
+    <PackageReference Include="Microsoft.AspNetCore.Components" Version="5.0.0-rc.2.*" />
+    <PackageReference Include="Microsoft.AspNetCore.Components.Web" Version="5.0.0-rc.2.*" />
     <PackageReference Include="NPOI" Version="2.5.1" />
   </ItemGroup>
 
@@ -41,6 +41,9 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Update="wwwroot\css\Styles.min.css">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Update="wwwroot\Scripts\ResizeTable.js">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
   </ItemGroup>

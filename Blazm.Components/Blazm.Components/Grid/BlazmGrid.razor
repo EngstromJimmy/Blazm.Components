@@ -5,23 +5,28 @@
 @using System.IO
 @using System.Dynamic
 @using Blazm.Components.Dynamic
+@using Microsoft.JSInterop
 @implements IGridContainer
 @implements IDisposable
 @inject ResizeListener listener
 @inject IJSRuntime jsruntime
 
+
 <div id="@("tablecontainer" + id)">
     <table class="table table-striped" id="@("table" + id)">
-
         @{
-            var firstRow = Data.FirstOrDefault();
-            if (AutoGenerateColumns && Data != null && Data.Any())
+            TItem firstRow = default!;
+            if (Data != null)
             {
-                //Check if type is expandoObject
-
-                if (firstRow is System.Dynamic.ExpandoObject)
+                firstRow = Data.FirstOrDefault();
+                if (AutoGenerateColumns && Data != null && Data.Any())
                 {
-                    TypeDescriptor.AddProvider(new ExpandoObjectTypeDescriptionProvider(), typeof(ExpandoObject));
+                    //Check if type is expandoObject
+
+                    if (firstRow is System.Dynamic.ExpandoObject)
+                    {
+                        TypeDescriptor.AddProvider(new ExpandoObjectTypeDescriptionProvider(), typeof(ExpandoObject));
+                    }
                 }
             }
         }
@@ -73,14 +78,7 @@
                         pagedData = pagedData.Skip(PageSize * CurrentPage).Take(PageSize);
                     }
 
-                    if (pagedData != null && !pagedData.Any())
-                    {
-                        <tr>
-                            <td class="alignCenter" colspan="@(Columns.Where(c => c.Visible).Count() + (ShowCheckbox?1:0) + (Columns.Any(c => c.Visible==false)?1:0))">
-                            @EmptyGridTemplate
-                            </td>
-                        </tr>;
-                    }
+
 
                     @foreach (var row in pagedData)
                     {
@@ -258,6 +256,24 @@
                 }
             }
         }
+
+        @if (Data != null && !Data.Any())
+        {
+        <tr>
+            <td class="alignCenter" colspan="@(Columns.Where(c => c.Visible).Count() + (ShowCheckbox?1:0) + (Columns.Any(c => c.Visible==false)?1:0))">
+                @EmptyGridTemplate
+            </td>
+        </tr>
+        }
+
+        @if (Data == null)
+        {
+        <tr>
+            <td class="alignCenter" colspan="@(Columns.Where(c => c.Visible).Count() + (ShowCheckbox?1:0) + (Columns.Any(c => c.Visible==false)?1:0))">
+                @NullGridTemplate
+            </td>
+        </tr>
+        }
         @if (ShowFooter && Data != null)
         {
             <tfoot>
@@ -277,7 +293,7 @@
             </tfoot>
         }
     </table>
-    @if (PageSize != 0 && Data.Count() > PageSize && GroupBy == null)
+    @if (PageSize != 0 && Data!=null && Data.Count() > PageSize && GroupBy == null)
     {
 
         <ul class="pagination">
@@ -299,10 +315,11 @@
 </div>
 
 @code
-{
-    public async Task ExportDataAsync(string filename, string sheetname = "sheet1", string dateformat = "MM/dd/yyyy HH:mm:ss")
     {
 
+    IJSObjectReference savefilemodule;
+    public async Task ExportDataAsync(string filename, string sheetname = "sheet1", string dateformat = "MM/dd/yyyy HH:mm:ss")
+    {
         IWorkbook workbook = new XSSFWorkbook();
 
         var newDataFormat = workbook.CreateDataFormat();
@@ -362,28 +379,17 @@
             }
         }
 
-        //for (int rownum = 0; rownum < 10000; rownum++)
-        //{
-        //    IRow row = worksheet.CreateRow(rownum);
-        //    for (int celnum = 0; celnum < 20; celnum++)
-        //    {
-        //        ICell Cell = row.CreateCell(celnum);
-        //        Cell.SetCellValue("Cell: Row-" + rownum + ";CellNo:" + celnum);
-        //    }
-        //}
-
         MemoryStream ms = new MemoryStream();
         workbook.Write(ms);
         byte[] bytes = ms.ToArray();
         ms.Close();
-
-        await jsruntime.SaveAsFileAsync(filename, bytes, "application/vnd.ms-excel");
+        savefilemodule = await jsruntime.InvokeAsync<IJSObjectReference>("import", "./_content/Blazm.Components/scripts/SaveAsFile.js");
+        await savefilemodule.InvokeVoidAsync("SaveAsFile", filename, bytes, "application/vnd.ms-excel");
     }
 
 
     [Parameter]
     public bool AutoGenerateColumns { get; set; } = false;
-
 
     [Parameter]
     public string NextText { get; set; } = "Next";
@@ -569,165 +575,176 @@
     } =@<i class="fas fa-greater-than"></i>;
 
 
-[Parameter]
-public RenderFragment EmptyGridTemplate
-{
-get;
-set;
-} 
+        [Parameter]
+        public RenderFragment EmptyGridTemplate
+        {
+            get;
+            set;
+        }
 
-[Parameter]
-public RenderFragment ExpandedTemplate
-{
-get;
-set;
-} = @<i class="fas fa-greater-than fa-rotate-90"></i>;
-
-[Parameter]
-public RenderFragment<object> GroupHeader
-{
-get;
-set;
-}
+        [Parameter]
+        public RenderFragment NullGridTemplate
+        {
+            get;
+            set;
+        }
 
 
-[Parameter]
-public Func<TItem, object> GroupBy { get; set; } = null;
+        [Parameter]
+        public RenderFragment ExpandedTemplate
+        {
+            get;
+            set;
+        } = @<i class="fas fa-greater-than fa-rotate-90"></i>;
 
-[Parameter]
-public IEnumerable<TItem> Data { get; set; }
+        [Parameter]
+        public RenderFragment<object> GroupHeader
+        {
+            get;
+            set;
+        }
 
-[Parameter]
-public List<TItem> SelectedData { get; set; } = new List<TItem>();
 
-private List<IGridColumn> Columns { get; set; } = new List<IGridColumn>();
-private List<IGridColumn> AllColumns { get; set; } = new List<IGridColumn>();
-private List<int> ExpandedRows = new List<int>();
-void IGridContainer.AddColumn(IGridColumn column)
-{
+        [Parameter]
+        public Func<TItem, object> GroupBy { get; set; } = null;
 
-column.Id = column.Field + column.Template?.GetHashCode() + column.Format?.GetHashCode();
+        [Parameter]
+        public IEnumerable<TItem> Data { get; set; }
 
-var col = Columns.FirstOrDefault(c => c.Id == column.Id);
-column.Type = typeof(TItem);
-if (col == null)
-{
-Columns.Add(column);
-}
-//If the grid is grouped we need access to all columns (one set per group)
-AllColumns.Add(column);
+        [Parameter]
+        public List<TItem> SelectedData { get; set; } = new List<TItem>();
 
-StateHasChanged();
-}
+        private List<IGridColumn> Columns { get; set; } = new List<IGridColumn>();
+        private List<IGridColumn> AllColumns { get; set; } = new List<IGridColumn>();
+        private List<int> ExpandedRows = new List<int>();
+        void IGridContainer.AddColumn(IGridColumn column)
+        {
 
-Task IGridContainer.Sort(IGridColumn column)
-{
-return InvokeAsync(() =>
-{
-if (Sortable)
-{
-if (SortField == column.Field && column.CanSort)
-{
-if (SortDirection == ListSortDirection.Descending)
-{
-SortDirection = ListSortDirection.Ascending;
-}
-else
-{
-SortDirection = ListSortDirection.Descending;
-}
-}
-else
-{
-SortField = column.Field;
-}
-StateHasChanged();
-}
-});
-}
+            column.Id = column.Field + column.Template?.GetHashCode() + column.Format?.GetHashCode();
 
-void IGridContainer.RemoveColumn(IGridColumn column)
-{
-Columns.Remove(column);
-}
+            var col = Columns.FirstOrDefault(c => c.Id == column.Id);
+            column.Type = typeof(TItem);
+            if (col == null)
+            {
+                Columns.Add(column);
+            }
+            //If the grid is grouped we need access to all columns (one set per group)
+            AllColumns.Add(column);
 
-protected async override Task OnAfterRenderAsync(bool firstRender)
-{
-if (firstRender)
-{
-listener.OnResized += WindowResized;
-}
-await base.OnAfterRenderAsync(firstRender);
-}
+            StateHasChanged();
+        }
+
+        Task IGridContainer.Sort(IGridColumn column)
+        {
+            return InvokeAsync(() =>
+            {
+                if (Sortable)
+                {
+                    if (SortField == column.Field && column.CanSort)
+                    {
+                        if (SortDirection == ListSortDirection.Descending)
+                        {
+                            SortDirection = ListSortDirection.Ascending;
+                        }
+                        else
+                        {
+                            SortDirection = ListSortDirection.Descending;
+                        }
+                    }
+                    else
+                    {
+                        SortField = column.Field;
+                    }
+                    StateHasChanged();
+                }
+            });
+        }
+
+        void IGridContainer.RemoveColumn(IGridColumn column)
+        {
+            Columns.Remove(column);
+        }
+
+        protected async override Task OnAfterRenderAsync(bool firstRender)
+        {
+            if (firstRender)
+            {
+                listener.OnResized += WindowResized;
+            }
+            await base.OnAfterRenderAsync(firstRender);
+        }
 
 #pragma warning disable 1998
-private async Task resizeTableAsync()
-{
-int reduceby = 0;
-Columns.ForEach((c) => c.Visible = true);
+        private async Task resizeTableAsync()
+        {
+            int reduceby = 0;
+            Columns.ForEach((c) => c.Visible = true);
 
-foreach (var c in Columns.Where(c => c.Priority > 0).OrderByDescending(c => c.Priority))
-{
-if (TableClientWidth - reduceby <= ContainerClientWidth)
-{
-break;
-}
-foreach (var col in AllColumns.Where(a => a.Id == c.Id))
-{
-//update all references (needed if grouped)
-col.Visible = false;
-}
-reduceby += c.ClientWidth;
-}
+            foreach (var c in Columns.Where(c => c.Priority > 0).OrderByDescending(c => c.Priority))
+            {
+                if (TableClientWidth - reduceby <= ContainerClientWidth)
+                {
+                    break;
+                }
+                foreach (var col in AllColumns.Where(a => a.Id == c.Id))
+                {
+                    //update all references (needed if grouped)
+                    col.Visible = false;
+                }
+                reduceby += c.ClientWidth;
+            }
 
-StateHasChanged();
-}
+            StateHasChanged();
+        }
 #pragma warning restore 1998
 
 
-void IDisposable.Dispose()
-{
-listener.OnResized -= WindowResized;
-}
+        void IDisposable.Dispose()
+        {
+            listener.OnResized -= WindowResized;
+        }
 
-async void WindowResized(object _, BrowserWindowSize window)
-{
-await ResizeGrid();
-}
+        async void WindowResized(object _, BrowserWindowSize window)
+        {
+            await ResizeGrid();
+        }
 
-public async Task ResizeGrid()
-{
-var size = await jsruntime.InvokeAsync<TableSize>("resizeTable", id, GroupBy != null);
-if (size != null)
-{
-for (var i = 0; i < size?.Columns?.Length; i++)
-{
-var counter = i;
-if (ShowCheckbox || Columns.Any(c => !c.Visible))
-{
-//Skip the first one
-counter = i - 1;
-if (i == 0)
-{
-continue;
-}
-}
-Columns[counter].ClientWidth = size.Columns[i];
-}
-TableClientWidth = size.TableClientWidth;
-ContainerClientWidth = size.ContainerClientWidth;
+        IJSObjectReference resizemodule;
+        public async Task ResizeGrid()
+        {
+            resizemodule = await jsruntime.InvokeAsync<IJSObjectReference>("import", "./_content/Blazm.Components/scripts/ResizeTable.js");
+            var size=await resizemodule.InvokeAsync<TableSize>("ResizeTable", id, GroupBy != null);
+            
+            if (size != null)
+            {
+                for (var i = 0; i < size?.Columns?.Length; i++)
+                {
+                    var counter = i;
+                    if (ShowCheckbox || Columns.Any(c => !c.Visible))
+                    {
+                        //Skip the first one
+                        counter = i - 1;
+                        if (i == 0)
+                        {
+                            continue;
+                        }
+                    }
+                    Columns[counter].ClientWidth = size.Columns[i];
+                }
+                TableClientWidth = size.TableClientWidth;
+                ContainerClientWidth = size.ContainerClientWidth;
 
-await resizeTableAsync();
+                await resizeTableAsync();
 
-StateHasChanged();
-}
-}
+                StateHasChanged();
+            }
+        }
 
-class TableSize
-{
-public int[] Columns { get; set; }
-public int TableClientWidth { get; set; }
-public int ContainerClientWidth { get; set; }
-}
+        class TableSize
+        {
+            public int[] Columns { get; set; }
+            public int TableClientWidth { get; set; }
+            public int ContainerClientWidth { get; set; }
+        }
 
 }

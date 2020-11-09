@@ -13,14 +13,12 @@
 
 <p>This component demonstrates fetching data from a service.</p>
 
-@if (forecasts == null)
-{
-    <p><em>Loading...</em></p>
-}
-else
-{
+
     <h2>BlazmGrid</h2>
     <BlazmGrid Data="forecasts" PageSize="10" Sortable="true" SortField="@nameof(WeatherForecast.Date)" ShowFooter="true">
+        <NullGridTemplate>
+            <span>Is null</span>
+        </NullGridTemplate>
         <GridColumns>
             <GridColumn Field="@nameof(WeatherForecast.Date)" Format="{0:d}" Priority="3" />
             <GridColumn Field="@nameof(WeatherForecast.TemperatureC)" HighlightSign="true" Priority="1" Class="alignRight">
@@ -45,7 +43,10 @@ else
 
     <h2>BlazmGrid grouped</h2>
     <button class="btn btn-success" @onclick="@(async ()=> { await GroupedGrid.ExportDataAsync("Weather.xlsx","Export","yyyy-mm-dd"); })">Export data to Excel</button>
-    <BlazmGrid @ref="GroupedGrid" GroupBy="d=>d.Summary" Data="forecasts.Take(20)" PageSize="10" Sortable="true" SortField="@nameof(WeatherForecast.Date)" ShowFooter="true" ShowGroupFooter="true">
+    <BlazmGrid @ref="GroupedGrid" GroupBy="d=>d.Summary" Data="forecasts" PageSize="10" Sortable="true" SortField="@nameof(WeatherForecast.Date)" ShowFooter="true" ShowGroupFooter="true">
+        <NullGridTemplate>
+            <span>Is null</span>
+        </NullGridTemplate>
         <GroupHeader>
             <h5>@context</h5>
         </GroupHeader>
@@ -78,7 +79,7 @@ else
         </GridColumns>
     </BlazmGrid>
 
-    <h2>Template</h2>
+    @*<h2>Template</h2>
     <table class="table">
         <thead>
             <tr>
@@ -99,14 +100,14 @@ else
                 </tr>
             }
         </tbody>
-    </table>
-}
+    </table>*@
+
 
 @code {
     private WeatherForecast[] forecasts;
     private BlazmGrid<WeatherForecast> GroupedGrid;
     protected override async Task OnInitializedAsync()
     {
-        forecasts = await ForecastService.GetForecastAsync(DateTime.Now);
+        forecasts = null; //await ForecastService.GetForecastAsync(DateTime.Now);
     }
 }
