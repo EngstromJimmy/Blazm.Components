@@ -1,4 +1,4 @@
-﻿@page "/fetchdata"
+﻿@page "/fetchdatanulltemplate"
 @using Blazm.Components
 @using SampleServerSide.Data
 @inject WeatherForecastService ForecastService
@@ -16,6 +16,9 @@
 
     <h2>BlazmGrid</h2>
     <BlazmGrid Data="forecasts" PageSize="10" Sortable="true" SortField="@nameof(WeatherForecast.Date)" ShowFooter="true">
+        <NullGridTemplate>
+            <span>Is null</span>
+        </NullGridTemplate>
         <GridColumns>
             <GridColumn Field="@nameof(WeatherForecast.Date)" Format="{0:d}" Priority="3" />
             <GridColumn Field="@nameof(WeatherForecast.TemperatureC)" HighlightSign="true" Priority="1" Class="alignRight">
@@ -39,8 +42,10 @@
     </BlazmGrid>
 
     <h2>BlazmGrid grouped</h2>
-    <button class="btn btn-success" @onclick="@(async ()=> { await GroupedGrid.ExportDataAsync("Weather.xlsx","Export","yyyy-mm-dd"); })">Export data to Excel</button>
     <BlazmGrid @ref="GroupedGrid" GroupBy="d=>d.Summary" Data="forecasts" PageSize="10" Sortable="true" SortField="@nameof(WeatherForecast.Date)" ShowFooter="true" ShowGroupFooter="true">
+        <NullGridTemplate>
+            <span>Is null</span>
+        </NullGridTemplate>
         <GroupHeader>
             <h5>@context</h5>
         </GroupHeader>
@@ -73,11 +78,35 @@
         </GridColumns>
     </BlazmGrid>
 
+    @*<h2>Template</h2>
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Date</th>
+                <th>Temp. (C)</th>
+                <th>Temp. (F)</th>
+                <th>Summary</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var forecast in forecasts)
+            {
+                <tr>
+                    <td>@forecast.Date.ToShortDateString()</td>
+                    <td>@forecast.TemperatureC</td>
+                    <td>@forecast.TemperatureF</td>
+                    <td>@forecast.Summary</td>
+                </tr>
+            }
+        </tbody>
+    </table>*@
+
+
 @code {
     private WeatherForecast[] forecasts;
     private BlazmGrid<WeatherForecast> GroupedGrid;
     protected override async Task OnInitializedAsync()
     {
-        forecasts = await ForecastService.GetForecastAsync(DateTime.Now);
+        forecasts = null; //await ForecastService.GetForecastAsync(DateTime.Now);
     }
 }
