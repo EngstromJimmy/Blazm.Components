@@ -11,10 +11,10 @@ namespace SampleServerSide.Data
             "Freezing", "Bracing", "Chilly", "Cool", "Mild", "Warm", "Balmy", "Hot", "Sweltering", "Scorching"
         };
 
-        public Task<WeatherForecast[]> GetForecastAsync(DateTime startDate)
+        public Task<WeatherForecast[]> GetForecastAsync(DateTime startDate,int numerofitems=50)
         {
             var rng = new Random();
-            return Task.FromResult(Enumerable.Range(1, 50).Select(index => new WeatherForecast
+            return Task.FromResult(Enumerable.Range(1, numerofitems).Select(index => new WeatherForecast
             {
                 Date = startDate.AddDays(index),
                 TemperatureC = rng.Next(-20, 55),

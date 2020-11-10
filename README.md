@@ -47,7 +47,7 @@ It is also using [FontAwesome](https://fontawesome.com/) so make sure you refere
 
 ### In Startup.cs
 
-1. Add ```services.AddGrid();```  
+1. Add ```services.AddBlazm();```  
 This adds the necessary things for the grid to be responsive.
 
 ### In your .Razor file
@@ -73,7 +73,6 @@ This adds the necessary things for the grid to be responsive.
 2. After the script tag (towards the bottom of the page) referring to blazor.server.js.
 Add 
 ``` html 
-<script src="_content/Blazm.Components/scripts/jsinterop.min.js"></script>
 <script src="_content/BlazorPro.BlazorSize/blazorSize.min.js"></script>
 ```
 
@@ -169,6 +168,13 @@ By supplying an ```EmptyGridTemplate``` you can specify if there should be any t
 <EmptyGridTemplate>
     No data found
 </EmptyGridTemplate>
+```
+### Null Grid Template
+By supplying an ```NullGridTemplate``` you can specify if there should be any text shown it the grid has no data (typically while you load data).
+``` html
+<NullGridTemplate>
+    Loading....
+</NullGridTemplate>
 ```
 
 ## Column features
