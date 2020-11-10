@@ -6,7 +6,7 @@
     <LangVersion>9</LangVersion>
     <Authors>Jimmy Engström</Authors>
     <Description>A collection of Blazor components</Description>
-    <Version>0.0.12</Version>
+    <Version>0.0.13</Version>
     <PackageProjectUrl>https://github.com/EngstromJimmy/Blazm.Components</PackageProjectUrl>
     <RepositoryUrl>https://github.com/EngstromJimmy/Blazm.Components</RepositoryUrl>
     <PackageTags>Blazor</PackageTags>

@@ -152,7 +152,7 @@ namespace Blazm.Components
         string id = Guid.NewGuid().ToString();
         int ContainerClientWidth { get; set; }
         int TableClientWidth { get; set; }
-        private Virtualize<TItem> virtualize { get; set; }
+        //private Virtualize<TItem> virtualize { get; set; }
         private ICollection<TItem> pagedData { get; set; }
 
         protected override Task OnInitializedAsync()
@@ -335,7 +335,6 @@ namespace Blazm.Components
             {
                 CurrentPage--;
             }
-            virtualize.RefreshDataAsync();
         }
 
         protected void NextPage()
@@ -344,7 +343,6 @@ namespace Blazm.Components
             {
                 CurrentPage++;
             }
-            virtualize.RefreshDataAsync();
         }
         
         void IGridContainer.AddColumn(IGridColumn column)

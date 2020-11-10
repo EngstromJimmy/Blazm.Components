@@ -17,7 +17,7 @@
     <h2>BlazmGrid</h2>
     <BlazmGrid Data="forecasts" PageSize="10" Sortable="true" SortField="@nameof(WeatherForecast.Date)" ShowFooter="true">
         <NullGridTemplate>
-            <span>Is null</span>
+            Loading...
         </NullGridTemplate>
         <GridColumns>
             <GridColumn Field="@nameof(WeatherForecast.Date)" Format="{0:d}" Priority="3" />
@@ -44,7 +44,7 @@
     <h2>BlazmGrid grouped</h2>
     <BlazmGrid @ref="GroupedGrid" GroupBy="d=>d.Summary" Data="forecasts" PageSize="10" Sortable="true" SortField="@nameof(WeatherForecast.Date)" ShowFooter="true" ShowGroupFooter="true">
         <NullGridTemplate>
-            <span>Is null</span>
+            Loading...
         </NullGridTemplate>
         <GroupHeader>
             <h5>@context</h5>
