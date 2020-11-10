@@ -146,6 +146,10 @@ namespace Blazm.Components
 
         #endregion
 
+
+
+        [Inject] ResizeListener listener { get; set; }
+        [Inject] IJSRuntime jsruntime { get; set; }
         private List<IGridColumn> Columns { get; set; } = new List<IGridColumn>();
         private List<IGridColumn> AllColumns { get; set; } = new List<IGridColumn>();
         private List<int> ExpandedRows = new List<int>();
@@ -397,7 +401,7 @@ namespace Blazm.Components
         {
             if (firstRender)
             {
-                //listener.OnResized += WindowResized;
+                listener.OnResized += WindowResized;
             }
             await base.OnAfterRenderAsync(firstRender);
         }
@@ -429,7 +433,7 @@ namespace Blazm.Components
 
         void IDisposable.Dispose()
         {
-            //listener.OnResized -= WindowResized;
+            listener.OnResized -= WindowResized;
         }
 
         async void WindowResized(object _, BrowserWindowSize window)
