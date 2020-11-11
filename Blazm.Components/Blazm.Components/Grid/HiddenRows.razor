@@ -4,7 +4,7 @@
 @if (Columns.Any(c => !c.Visible))
 {
     <tr class="@(ExpandedRows.Contains(Row.GetHashCode()) ? "" : "hidden")">
-        <td colspan="@(Columns.Count(c => !c.Visible)+ (ShowCheckbox?1:0))">
+        <td colspan="@(Columns.Count(c => c.Visible)+ (ShowCheckbox?1:0))">
             <dl>
                 @foreach (var hiddencolumn in Columns.Where(c => !c.Visible))
                 {
