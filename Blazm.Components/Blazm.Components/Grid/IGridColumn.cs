@@ -5,6 +5,18 @@ namespace Blazm.Components
 {
     public interface IGridColumn
     {
+        string Id
+        {
+            get;
+            set;
+        }
+
+        bool Exportable
+        {
+            get;
+            set;
+        }
+            
         int Priority
         {
             get;
@@ -87,6 +99,11 @@ namespace Blazm.Components
         {
             get;
             set;
+        }
+
+        bool CanSort
+        { 
+            get; 
         }
 
         public RenderFragment<object> FooterTemplate

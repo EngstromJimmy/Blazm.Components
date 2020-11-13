@@ -11,7 +11,9 @@ Blazor + Azm == Blazm and it will make you site blazm (blossom).
 I know.. I like puns.
 
 
-##Components
+![Blazm](Blazm.gif)
+
+##  Components
 
 BlazmGrid
 
@@ -27,6 +29,14 @@ BlazmGrid
 </BlazmGrid>
 ```
 
+
+## Sponsors
+Thanks you to much to my sponsors!  
+![](https://raw.githubusercontent.com/EngstromJimmy/Blazm.Components/master/TelerikRect.png)
+
+
+Telerik UI for Blazor – Increase productivity and cut cost in half! Use the Telerik truly native Blazor UI components to cover any app scenario. [Give it a try.](https://www.telerik.com/campaigns/blazor/free-trial-1?utm_source=jimmyengstrom&utm_medium=cpm&utm_campaign=blazor-trial-github-blazmcomp-sponsored-message)
+
 ## How to get started
 
 ### Prerequisites
@@ -37,7 +47,7 @@ It is also using [FontAwesome](https://fontawesome.com/) so make sure you refere
 
 ### In Startup.cs
 
-1. Add ```services.AddGrid();```  
+1. Add ```services.AddBlazm();```  
 This adds the necessary things for the grid to be responsive.
 
 ### In your .Razor file
@@ -63,7 +73,6 @@ This adds the necessary things for the grid to be responsive.
 2. After the script tag (towards the bottom of the page) referring to blazor.server.js.
 Add 
 ``` html 
-<script src="_content/Blazm.Components/scripts/jsinterop.min.js"></script>
 <script src="_content/BlazorPro.BlazorSize/blazorSize.min.js"></script>
 ```
 
@@ -153,6 +162,21 @@ Will sum ALL the double-fields in the entire table.
 </GridColumn>
 ```
 
+### Empty Grid Template
+By supplying an ```EmptyGridTemplate``` you can specify if there should be any text shown it the grid is empty.
+``` html
+<EmptyGridTemplate>
+    No data found
+</EmptyGridTemplate>
+```
+### Null Grid Template
+By supplying an ```NullGridTemplate``` you can specify if there should be any text shown it the grid has no data (typically while you load data).
+``` html
+<NullGridTemplate>
+    Loading....
+</NullGridTemplate>
+```
+
 ## Column features
 
 ### Column header
@@ -203,3 +227,51 @@ Priority 0 is the highest priority which means the column will always be visible
 It uses [BlazorPro.BlazorSize](https://github.com/EdCharbeneau/BlazorSize) by Ed Charbeneau to detect resize on the client.
 If a column is hidden, an icon will appear and the row will become expandable (to show the removed columns).
 The icon is customizable using ```ExpandTemplate``` and ```CollapseTemplate```
+
+### Command columns
+
+To add a column that is not connected to any field (like command buttons for example) just add a GridColumn without the Field-property.
+
+``` html
+<GridColumn>
+    <Template>
+        @{
+            var item = context as WeatherForecast;
+        }
+        <button class="btn btn-danger" @onclick="@(async () => { await Delete(item); })"><i class="far fa-trash-alt"></i></button>
+    </Template>
+</GridColumn>
+```
+
+### Export to Excel
+
+The build-in support for exporting data to Excel will not us templated columns (it will render the value not the template).
+All columns will be exported by default.
+Add ```Exportable=false``` to exclude columns from the export.
+
+``` html
+<button class="btn btn-success" @onclick="@(async ()=> { await MyGrid.ExportDataAsync("Weather.xlsx","Export","yyyy-mm-dd"); })">Export data to Excel</button>
+    
+<BlazmGrid @ref="MyGrid" .......>
+//Code removed for brevity
+
+```
+and in the code section add
+``` csharp
+private BlazmGrid<WeatherForecast> MyGrid;
+```
+
+### Auto generate columns
+
+If you want to auto generate columns you can do that by setting ```AutoGenerateColumns="true"```
+The grid will then create columns for all the properties on your data object.
+
+``` html
+<BlazmGrid Data="forecasts" AutoGenerateColumns="true">
+</BlazmGrid>
+```
+
+### dynamic
+
+You can use dynamic (ExpandoObject) with the grid.
+If you for example have a DataTable, convert it to dynamic and it will work with the grid.
