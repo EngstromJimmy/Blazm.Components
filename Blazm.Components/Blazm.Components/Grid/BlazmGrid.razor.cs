@@ -7,9 +7,13 @@ using NPOI.SS.UserModel;
 using NPOI.XSSF.UserModel;
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using System.Collections.Specialized;
 using System.ComponentModel;
+using System.Drawing;
 using System.IO;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -139,14 +143,12 @@ namespace Blazm.Components
         public ItemsProviderDelegate<TItem> ItemsProvider { get; set; }
 
         [Parameter]
-        public ICollection<TItem> Data { get; set; }
+        public IEnumerable<TItem>? Data { get; set; }
 
         [Parameter]
         public List<TItem> SelectedData { get; set; } = new List<TItem>();
 
         #endregion
-
-
 
         [Inject] ResizeListener listener { get; set; }
         [Inject] IJSRuntime jsruntime { get; set; }
@@ -156,38 +158,64 @@ namespace Blazm.Components
         string id = Guid.NewGuid().ToString();
         int ContainerClientWidth { get; set; }
         int TableClientWidth { get; set; }
-        //private Virtualize<TItem> virtualize { get; set; }
-        private ICollection<TItem> pagedData { get; set; }
+        private Virtualize<TItem> virtualize { get; set; }
+        private IEnumerable<TItem> pagedData { get; set; }
 
-        protected override Task OnInitializedAsync()
+        protected override async  Task OnParametersSetAsync()
         {
-//            if (GroupBy == null)
-//            {
-//                if (ItemsProvider!= null)
-//                {
-//#pragma warning disable BL0005 // Component parameter should not be set outside of its component.
-//                    virtualize.Items =null;
-//                    virtualize.ItemsProvider = ItemsProvider;
-//#pragma warning restore BL0005 // Component parameter should not be set outside of its component.
-//                }
-//            }
-
-            return base.OnInitializedAsync();
+            await RefreshDataAsync();
+               
+            await base.OnParametersSetAsync();
         }
 
-        //private async ValueTask<ItemsProviderResult<TItem>> LoadData(ItemsProviderRequest request)
-        //{
-        //    int totalRows = 0;
-        //    if (pagedData != null)
-        //    {
-        //        totalRows = pagedData.Count();
-        //    }
-        //    var numberofItems = Math.Min(request.Count, totalRows - request.StartIndex);
 
-        //    return new ItemsProviderResult<TItem>(pagedData.Skip(request.StartIndex).Take(numberofItems), totalRows);
-        //}
+        public async Task  RefreshDataAsync()
+        {
+            if (virtualize != null && Data != null)
+            {
+                await virtualize.RefreshDataAsync();
+            }
+        }
 
-        
+        private void loadPagedData()
+        {
+            if (Data != null)
+            {
+                pagedData = Data;
+
+                if (SortField != null)
+                {
+                    if (SortDirection == ListSortDirection.Descending)
+                    {
+                        pagedData = pagedData.OrderByDescending(x => x.GetType().GetProperty(SortField).GetValue(x, null)).ToList();
+                    }
+                    else
+                    {
+                        pagedData = pagedData.OrderBy(x => x.GetType().GetProperty(SortField).GetValue(x, null)).ToList();
+                    }
+                }
+
+                if (PageSize != 0)
+                {
+                    pagedData = pagedData.Skip(PageSize * CurrentPage).Take(PageSize).ToList();
+                }
+            }
+        }
+
+        private async ValueTask<ItemsProviderResult<TItem>> LoadData(ItemsProviderRequest request)
+        {
+            loadPagedData();
+            int totalRows = 0;
+            if (pagedData != null)
+            {
+                totalRows = pagedData.Count();
+            }
+            var numberofItems = Math.Min(request.Count, totalRows - request.StartIndex);
+
+            return new ItemsProviderResult<TItem>(pagedData.Skip(request.StartIndex).Take(numberofItems), totalRows);
+        }
+
+
         public async Task ExportDataAsync(string filename, string sheetname = "sheet1", string dateformat = "MM/dd/yyyy HH:mm:ss")
         {
             IWorkbook workbook = new XSSFWorkbook();
@@ -333,20 +361,22 @@ namespace Blazm.Components
             CurrentPage = pageNumber;
         }
 
-        protected void PreviousPage()
+        protected async Task PreviousPage()
         {
             if (CurrentPage > 0)
             {
                 CurrentPage--;
             }
+            await RefreshDataAsync();
         }
 
-        protected void NextPage()
+        protected async Task  NextPage()
         {
             if ((CurrentPage * PageSize) + PageSize < Data.Count())
             {
                 CurrentPage++;
             }
+            await RefreshDataAsync();
         }
         
         void IGridContainer.AddColumn(IGridColumn column)
@@ -368,7 +398,7 @@ namespace Blazm.Components
 
         Task IGridContainer.Sort(IGridColumn column)
         {
-            return InvokeAsync(() =>
+            return InvokeAsync(async () =>
             {
                 if (Sortable)
                 {
@@ -387,6 +417,7 @@ namespace Blazm.Components
                     {
                         SortField = column.Field;
                     }
+                    await RefreshDataAsync();
                     StateHasChanged();
                 }
             });
@@ -399,6 +430,7 @@ namespace Blazm.Components
 
         protected async override Task OnAfterRenderAsync(bool firstRender)
         {
+            await RefreshDataAsync();
             if (firstRender)
             {
                 listener.OnResized += WindowResized;
@@ -440,6 +472,7 @@ namespace Blazm.Components
         {
             await ResizeGrid();
         }
+
 
         IJSObjectReference resizemodule;
         public async Task ResizeGrid()

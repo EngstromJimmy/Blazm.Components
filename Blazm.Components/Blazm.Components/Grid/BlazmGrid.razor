@@ -56,29 +56,8 @@
             <tbody>
                 @if (Data != null)
                 {
-                    pagedData = Data;
 
-                    if (SortField != null)
-                    {
-                        if (SortDirection == ListSortDirection.Descending)
-                        {
-                            pagedData = pagedData.OrderByDescending(x => x.GetType().GetProperty(SortField).GetValue(x, null)).ToList();
-                        }
-                        else
-                        {
-                            pagedData = pagedData.OrderBy(x => x.GetType().GetProperty(SortField).GetValue(x, null)).ToList();
-                        }
-                    }
-
-                    if (PageSize != 0)
-                    {
-                        pagedData = pagedData.Skip(PageSize * CurrentPage).Take(PageSize).ToList();
-                    }
-
-
-                    @*<Virtualize @ref="virtualize" TItem="TItem" Context="row" Items="pagedData">*@
-                    @foreach (var row in pagedData)
-                    {
+                    <Virtualize @ref="virtualize" TItem="TItem" Context="row" ItemsProvider="LoadData">
                         <tr class="@(Columns.Any(c => !c.Visible) ? "expandable" : "")" @onclick="@(() => { if (ExpandedRows.Contains(row.GetHashCode())) { ExpandedRows.Remove(row.GetHashCode()); } else { ExpandedRows.Add(row.GetHashCode()); } })">
                             @if (Columns.Any(c => !c.Visible) || ShowCheckbox)
                             {
@@ -124,8 +103,8 @@
                             }
                         </tr>
                         <HiddenRows Columns="@Columns" ExpandedRows="@ExpandedRows" ShowCheckbox="@ShowCheckbox" Row="@row"></HiddenRows>
-                    }
-                        @*</Virtualize>*@
+                    
+                        </Virtualize>
                 }
             </tbody>
         }
