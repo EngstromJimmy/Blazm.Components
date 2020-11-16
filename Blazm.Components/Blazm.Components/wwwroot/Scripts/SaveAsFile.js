@@ -1,4 +1,4 @@
-﻿export function SaveAsFile(filename, type, bytesBase64) {
+﻿export function SaveAsFile(filename, bytesBase64, type) {
     if (navigator.msSaveBlob) {
         //Download document in Edge browser
         var data = window.atob(bytesBase64);
