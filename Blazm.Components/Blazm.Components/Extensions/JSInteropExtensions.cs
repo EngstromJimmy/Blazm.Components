@@ -11,7 +11,7 @@ namespace Microsoft.JSInterop
         public static async Task SaveAsFileAsync(this IJSRuntime js, string filename, byte[] data, string type = "application/octet-stream")
         {
             var savefilemodule = await js.InvokeAsync<IJSObjectReference>("import", "./_content/Blazm.Components/scripts/SaveAsFile.js");
-            await savefilemodule.InvokeVoidAsync("SaveAsFile", filename, "application/vnd.ms-excel",data);
+            await savefilemodule.InvokeVoidAsync("SaveAsFile", filename, type,data);
         }   
     }
 }
