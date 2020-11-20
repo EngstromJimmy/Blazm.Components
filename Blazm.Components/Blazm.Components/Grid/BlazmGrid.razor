@@ -217,7 +217,7 @@
                     @if (ShowGroupFooter)
                     {
                         <tr class="footerrow">
-                            @if (ShowCheckbox)
+                            @if (ShowCheckbox || Columns.Any(c => !c.Visible))
                             {
                                 <td></td>
                             }
@@ -255,7 +255,7 @@
         {
             <tfoot>
                 <tr class="footerrow">
-                    @if (ShowCheckbox)
+                    @if (ShowCheckbox || Columns.Any(c => !c.Visible))
                     {
                         <td></td>
                     }
