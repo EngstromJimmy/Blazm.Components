@@ -260,6 +260,7 @@ and in the code section add
 ``` csharp
 private BlazmGrid<WeatherForecast> MyGrid;
 ```
+WeatherForecast is the type of data you have in the grid.
 
 ### Auto generate columns
 
