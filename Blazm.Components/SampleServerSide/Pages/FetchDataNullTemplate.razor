@@ -54,7 +54,7 @@
             <GridColumn Field="@nameof(WeatherForecast.TemperatureC)" HighlightSign="true" Priority="1" Class="alignRight">
                 <FooterTemplate>
                     @{
-                            var temp = context as List<WeatherForecast>;
+                        var temp = context as List<WeatherForecast>;
                     }
                     @temp.Sum(t => t.TemperatureC)
                 </FooterTemplate>
@@ -69,7 +69,7 @@
             <GridColumn Field="@nameof(WeatherForecast.TemperatureF)" Priority="2" Class="alignRight">
                 <FooterTemplate>
                     @{
-                            var temp = context as List<WeatherForecast>;
+                        var temp = context as List<WeatherForecast>;
                     }
                     @temp.Sum(t => t.TemperatureF)
                 </FooterTemplate>
@@ -78,34 +78,10 @@
         </GridColumns>
     </BlazmGrid>
 
-    @*<h2>Template</h2>
-    <table class="table">
-        <thead>
-            <tr>
-                <th>Date</th>
-                <th>Temp. (C)</th>
-                <th>Temp. (F)</th>
-                <th>Summary</th>
-            </tr>
-        </thead>
-        <tbody>
-            @foreach (var forecast in forecasts)
-            {
-                <tr>
-                    <td>@forecast.Date.ToShortDateString()</td>
-                    <td>@forecast.TemperatureC</td>
-                    <td>@forecast.TemperatureF</td>
-                    <td>@forecast.Summary</td>
-                </tr>
-            }
-        </tbody>
-    </table>*@
-
-
 @code {
     private WeatherForecast[] forecasts;
     private BlazmGrid<WeatherForecast> GroupedGrid;
-    protected override async Task OnInitializedAsync()
+    protected override void OnInitialized()
     {
         forecasts = null; 
     }
