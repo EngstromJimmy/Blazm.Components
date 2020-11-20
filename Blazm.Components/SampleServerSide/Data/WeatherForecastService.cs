@@ -11,6 +11,11 @@ namespace SampleServerSide.Data
             "Freezing", "Bracing", "Chilly", "Cool", "Mild", "Warm", "Balmy", "Hot", "Sweltering", "Scorching"
         };
 
+        private static readonly string[] Locations = new[]
+        {
+            "Central City", "Duckburg", "Gotham City", "Metropolis", "Star City", "Wakanda"
+        };
+
         public Task<WeatherForecast[]> GetForecastAsync(DateTime startDate,int numerofitems=50)
         {
             var rng = new Random();
@@ -18,7 +23,8 @@ namespace SampleServerSide.Data
             {
                 Date = startDate.AddDays(index),
                 TemperatureC = rng.Next(-20, 55),
-                Summary = Summaries[rng.Next(Summaries.Length)]
+                Summary = Summaries[rng.Next(Summaries.Length)],
+                Location = Locations[rng.Next(Locations.Length)]
             }).ToArray());
         }
     }
