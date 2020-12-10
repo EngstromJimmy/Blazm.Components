@@ -1,0 +1,56 @@
+﻿@inherits TestContext
+@using AutoFixture
+
+@code
+{
+    private AutoFixture.Fixture fixture = new AutoFixture.Fixture();
+
+    class Data
+    {
+        [Display(Name = "Comes from attribute")]
+        public string String { get; set; }
+    }
+
+    public BlazmGridRazorTest2()
+    {
+        Services.AddBlazm();
+    }
+
+    [Fact]
+    public void Renders_Column_Name_Based_On_Name()
+    {
+        var testData = fixture.Create<List<Data>>();
+        var cut = Render(@<BlazmGrid Data="@testData">
+                                <GridColumns>
+                                    <GridColumn Field="@nameof(Data.String)" Title="FOO" />
+                                </GridColumns>
+                            </BlazmGrid>);
+        
+        cut.Find("thead tr th")
+            .TextContent
+            .Should()
+            .Be("FOO");
+    }
+
+    [Fact]
+    public void Will_Render_Empty_Table()
+    {
+        var cut = RenderComponent<BlazmGrid<string>>();
+
+        var table = cut.Find("table");
+
+        table.MarkupMatches(@<table class="table table-striped" id:ignore="table[.*]">
+                               <thead>
+                                  <tr>
+                                  </tr>
+                                </thead>
+                                <tbody></tbody>
+                                <tbody>
+                                  <tr>
+                                    <td class="alignCenter" colspan='0'></td>
+                                  </tr>
+                                </tbody>
+                              </table>);
+    }
+
+} 
