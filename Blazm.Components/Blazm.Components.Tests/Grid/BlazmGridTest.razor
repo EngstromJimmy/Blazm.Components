@@ -11,25 +11,25 @@
         public string String { get; set; }
     }
 
-    public BlazmGridRazorTest2()
+    public BlazmGridTest()
     {
         Services.AddBlazm();
     }
 
     [Fact]
-    public void Renders_Column_Name_Based_On_Name()
+    public void Renders_Column_Name_Based_On_Attribute()
     {
         var testData = fixture.Create<List<Data>>();
         var cut = Render(@<BlazmGrid Data="@testData">
                                 <GridColumns>
-                                    <GridColumn Field="@nameof(Data.String)" Title="FOO" />
+                                    <GridColumn Field="@nameof(Data.String)" Type="@typeof(Data)" />
                                 </GridColumns>
                             </BlazmGrid>);
         
         cut.Find("thead tr th")
             .TextContent
             .Should()
-            .Be("FOO");
+            .Be("Comes from attribute");
     }
 
     [Fact]
