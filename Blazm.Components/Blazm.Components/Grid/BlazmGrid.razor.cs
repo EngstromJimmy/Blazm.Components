@@ -477,31 +477,37 @@ namespace Blazm.Components
         IJSObjectReference resizemodule;
         public async Task ResizeGrid()
         {
-            resizemodule = await jsruntime.InvokeAsync<IJSObjectReference>("import", "./_content/Blazm.Components/scripts/ResizeTable.js");
-            var size = await resizemodule.InvokeAsync<TableSize>("ResizeTable", id, GroupBy != null);
-
-            if (size != null)
+            try
             {
-                for (var i = 0; i < size?.Columns?.Length; i++)
+                resizemodule = await jsruntime.InvokeAsync<IJSObjectReference>("import", "/_content/Blazm.Components/scripts/ResizeTable.js");
+                var size = await resizemodule.InvokeAsync<TableSize>("ResizeTable", id, GroupBy != null);
+
+                if (size != null)
                 {
-                    var counter = i;
-                    if (ShowCheckbox || Columns.Any(c => !c.Visible))
+                    for (var i = 0; i < size?.Columns?.Length; i++)
                     {
-                        //Skip the first one
-                        counter = i - 1;
-                        if (i == 0)
+                        var counter = i;
+                        if (ShowCheckbox || Columns.Any(c => !c.Visible))
                         {
-                            continue;
+                            //Skip the first one
+                            counter = i - 1;
+                            if (i == 0)
+                            {
+                                continue;
+                            }
                         }
+                        Columns[counter].ClientWidth = size.Columns[i];
                     }
-                    Columns[counter].ClientWidth = size.Columns[i];
+                    TableClientWidth = size.TableClientWidth;
+                    ContainerClientWidth = size.ContainerClientWidth;
+
+                    await resizeTableAsync();
+
+                    StateHasChanged();
                 }
-                TableClientWidth = size.TableClientWidth;
-                ContainerClientWidth = size.ContainerClientWidth;
+            }
+            catch { 
 
-                await resizeTableAsync();
-
-                StateHasChanged();
             }
         }
 
