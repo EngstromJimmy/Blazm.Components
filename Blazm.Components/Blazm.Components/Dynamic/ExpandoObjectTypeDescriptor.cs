@@ -12,7 +12,7 @@ namespace Blazm.Components.Dynamic
 
         public ExpandoObjectTypeDescriptor(dynamic instance)
         {
-            m_Instance = instance as IDictionary<string, object>;
+            m_Instance = instance as IDictionary<string, object> ?? new Dictionary<string, object>();
         }
 
         public string GetComponentName()
@@ -60,7 +60,7 @@ namespace Blazm.Components.Dynamic
             return TypeDescriptor.GetEditor(this, editorBaseType, true);
         }
 
-        public PropertyDescriptor GetDefaultProperty()
+        public PropertyDescriptor? GetDefaultProperty()
         {
             return null;
         }
@@ -113,7 +113,7 @@ namespace Blazm.Components.Dynamic
                 }
             }
 
-            public override Type ComponentType
+            public override Type? ComponentType
             {
                 get { return null; }
             }
