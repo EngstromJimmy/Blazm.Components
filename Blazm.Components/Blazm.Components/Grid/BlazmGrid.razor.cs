@@ -152,6 +152,8 @@ namespace Blazm.Components
 
         [Inject] ResizeListener listener { get; set; }
         [Inject] IJSRuntime jsruntime { get; set; }
+
+        private bool ShowAllColumns { get; set; }
         private List<IGridColumn> Columns { get; set; } = new List<IGridColumn>();
         private List<IGridColumn> AllColumns { get; set; } = new List<IGridColumn>();
         private List<int> ExpandedRows = new List<int>();
@@ -480,7 +482,13 @@ namespace Blazm.Components
             try
             {
                 resizemodule = await jsruntime.InvokeAsync<IJSObjectReference>("import", "/_content/Blazm.Components/scripts/ResizeTable.js");
+                ShowAllColumns = true;
+                StateHasChanged();
+
                 var size = await resizemodule.InvokeAsync<TableSize>("ResizeTable", id, GroupBy != null);
+
+                ShowAllColumns = false;
+                StateHasChanged();
 
                 if (size != null)
                 {
@@ -506,7 +514,8 @@ namespace Blazm.Components
                     StateHasChanged();
                 }
             }
-            catch { 
+            catch (Exception ex)
+            { 
 
             }
         }

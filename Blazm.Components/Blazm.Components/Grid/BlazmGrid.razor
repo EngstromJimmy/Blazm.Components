@@ -8,7 +8,7 @@
 @using Microsoft.JSInterop
 
 <div id="@("tablecontainer" + id)">
-    <table class="table-striped table" id="@("table" + id)">
+    <table class="table-striped table @(ShowAllColumns?"countableClientWidth":"")" id="@("table" + id)">
         @{
             TItem firstRow = default!;
             if (Data != null)
