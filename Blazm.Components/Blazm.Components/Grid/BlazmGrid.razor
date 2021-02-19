@@ -30,7 +30,7 @@
         {
             <thead>
                 <tr>
-                    @if (ShowCheckbox || Columns.Any(c => !c.Visible))
+                    @if (ShowCheckbox || Columns.Any(c => !c.Visible) || DetailTemplate!=null)
                     {
                         <th>
                             @if (ShowCheckbox)
@@ -55,54 +55,61 @@
                 @if (Data != null)
                 {
 
-                    <Virtualize @ref="virtualize" TItem="TItem" Context="row" ItemsProvider="LoadData">
-                        <tr class="@(Columns.Any(c => !c.Visible) ? "expandable" : "")" @onclick="@(() => { if (ExpandedRows.Contains(row.GetHashCode())) { ExpandedRows.Remove(row.GetHashCode()); } else { ExpandedRows.Add(row.GetHashCode()); } })">
-                            @if (Columns.Any(c => !c.Visible) || ShowCheckbox)
-                            {
-                                <td>
-                                    @if (Columns.Any(c => !c.Visible))
-                                    {
-
-                                        if (ExpandedRows.Contains(row.GetHashCode()))
-                                        {
-                                            @ExpandedTemplate
-                                        }
-                                        else
-                                        {
-                                            @CollapsedTemplate
-                                        }
-                                    }
-                                    @if (ShowCheckbox)
-                                    {
-                                        <input type="checkbox" checked="@(isItemSelected(row))" @onchange="async eventArgs => { await selectItemAsync(row, eventArgs.Value); }" />
-                                    }
-                                </td>
-                            }
-                            @foreach (var column in Columns)
-                            {
-                                if (column.Template == null)
+                <Virtualize @ref="virtualize" TItem="TItem" Context="row" ItemsProvider="LoadData">
+                    <tr class="@(Columns.Any(c => !c.Visible) ? "expandable" : "")" @onclick="@(() => { if (ExpandedRows.Contains(row.GetHashCode())) { ExpandedRows.Remove(row.GetHashCode()); } else { ExpandedRows.Add(row.GetHashCode()); } })">
+                        @if (Columns.Any(c => !c.Visible) || ShowCheckbox || DetailTemplate != null)
+                        {
+                            <td>
+                                @if (Columns.Any(c => !c.Visible) || DetailTemplate != null)
                                 {
-                                    string stringValue = "";
 
-                                    if (column.Format == null)
+                                    if (ExpandedRows.Contains(row.GetHashCode()))
                                     {
-                                        stringValue = TypeDescriptor.GetProperties(row)[column.Field].GetValue(row)?.ToString();
+                                        @ExpandedTemplate
                                     }
                                     else
                                     {
-                                        stringValue = string.Format(column.Format, TypeDescriptor.GetProperties(row)[column.Field].GetValue(row));
+                                        @CollapsedTemplate
                                     }
-                                    <td class="@column.Class @getSignClass(column, stringValue) @column.DataClass ">@stringValue</td>
+                                }
+                                @if (ShowCheckbox)
+                                {
+                                    <input type="checkbox" checked="@(isItemSelected(row))" @onchange="async eventArgs => { await selectItemAsync(row, eventArgs.Value); }" />
+                                }
+                            </td>
+                        }
+                        @foreach (var column in Columns)
+                        {
+                            if (column.Template == null)
+                            {
+                                string stringValue = "";
+
+                                if (column.Format == null)
+                                {
+                                    stringValue = TypeDescriptor.GetProperties(row)[column.Field].GetValue(row)?.ToString();
                                 }
                                 else
                                 {
-                                    <td class="@column.Class @column.DataClass">@column.Template(row)</td>
+                                    stringValue = string.Format(column.Format, TypeDescriptor.GetProperties(row)[column.Field].GetValue(row));
                                 }
+                                <td class="@column.Class @getSignClass(column, stringValue) @column.DataClass ">@stringValue</td>
                             }
-                        </tr>
-                        <HiddenRows Columns="@Columns" ExpandedRows="@ExpandedRows" ShowCheckbox="@ShowCheckbox" Row="@row"></HiddenRows>
-                    
-                        </Virtualize>
+                            else
+                            {
+                                <td class="@column.Class @column.DataClass">@column.Template(row)</td>
+                            }
+                        }
+                    </tr>
+                    <HiddenRows Columns="@Columns" ExpandedRows="@ExpandedRows" ShowCheckbox="@ShowCheckbox" Row="@row"></HiddenRows>
+                    @if (DetailTemplate != null && ExpandedRows.Contains(row.GetHashCode()))
+                    {
+                    <tr>
+                        <td colspan="@(Columns.Count(c => c.Visible)+ (ShowCheckbox?1:0) + (DetailTemplate!=null ? 1 : 0))">
+                            @DetailTemplate(row)
+                        </td>
+                    </tr>
+                    }
+                </Virtualize>
                 }
             </tbody>
         }
@@ -117,105 +124,113 @@
                 var groupedData = Data.GroupBy(GroupBy);
                 foreach (var d in groupedData)
                 {
-                    <tbody>
-                        @if (GroupHeader != null)
+    <tbody>
+        @if (GroupHeader != null)
+        {
+            <tr class="headerrow"><td colspan="@(Columns.Where(c => c.Visible).Count() + (ShowCheckbox?1:0) + (DetailTemplate!=null?1:0) + (Columns.Any(c => c.Visible==false)?1:0))"> @GroupHeader(d.Key)</td></tr>
+        }
+        <tr>
+            @if (ShowCheckbox || Columns.Any(c => !c.Visible) || DetailTemplate != null)
+            {
+                <th>
+                    @if (ShowCheckbox)
+                    {
+                        <input type="checkbox" @onchange="async eventArgs => { await selectItemsAsync(d.ToList(), eventArgs.Value); }" />
+                    }
+                </th>
+            }
+            <CascadingValue Value="@this">
+                @GridColumns
+
+
+                @if (AutoGenerateColumns && Data != null && Data.Any())
+                {
+                    foreach (PropertyDescriptor propName in TypeDescriptor.GetProperties(firstRow))
+                    {
+                        <GridColumn Field="@propName.Name" />
+                    }
+                }
+
+
+            </CascadingValue>
+        </tr>
+        @{
+            var groupData = d.ToList();
+            if (SortField != null)
+            {
+                if (SortDirection == ListSortDirection.Descending)
+                {
+                    groupData = groupData.OrderByDescending(x => x.GetType().GetProperty(SortField).GetValue(x, null)).ToList();
+                }
+                else
+                {
+                    groupData = groupData.OrderBy(x => x.GetType().GetProperty(SortField).GetValue(x, null)).ToList();
+                }
+            }
+        }
+
+
+        @foreach (var row in groupData)
+        {
+            <tr class="@(Columns.Any(c => !c.Visible) || DetailTemplate != null ? "expandable" : "")" @onclick="@(() => { if (ExpandedRows.Contains(row.GetHashCode())) { ExpandedRows.Remove(row.GetHashCode()); } else { ExpandedRows.Add(row.GetHashCode()); } })">
+                @if (Columns.Any(c => !c.Visible) || ShowCheckbox || DetailTemplate != null)
+                {
+                    <td>
+                        @if (Columns.Any(c => !c.Visible) || DetailTemplate != null)
                         {
-                            <tr class="headerrow"><td colspan="@(Columns.Where(c => c.Visible).Count() + (ShowCheckbox?1:0) + (Columns.Any(c => c.Visible==false)?1:0))"> @GroupHeader(d.Key)</td></tr>
-                        }
-                        <tr>
-                            @if (ShowCheckbox || Columns.Any(c => !c.Visible))
+
+                            if (ExpandedRows.Contains(row.GetHashCode()))
                             {
-                                <th>
-                                    @if (ShowCheckbox)
-                                    {
-                                        <input type="checkbox" @onchange="async eventArgs => { await selectItemsAsync(d.ToList(), eventArgs.Value); }" />
-                                    }
-                                </th>
+                                @ExpandedTemplate
                             }
-                            <CascadingValue Value="@this">
-                                @GridColumns
-
-
-                                @if (AutoGenerateColumns && Data != null && Data.Any())
-                                {
-                                    foreach (PropertyDescriptor propName in TypeDescriptor.GetProperties(firstRow))
-                                    {
-                                        <GridColumn Field="@propName.Name" />
-                                    }
-                                }
-
-
-                            </CascadingValue>
-                        </tr>
-                        @{
-                            var groupData = d.ToList();
-                            if (SortField != null)
+                            else
                             {
-                                if (SortDirection == ListSortDirection.Descending)
-                                {
-                                    groupData = groupData.OrderByDescending(x => x.GetType().GetProperty(SortField).GetValue(x, null)).ToList();
-                                }
-                                else
-                                {
-                                    groupData = groupData.OrderBy(x => x.GetType().GetProperty(SortField).GetValue(x, null)).ToList();
-                                }
+                                @CollapsedTemplate
                             }
                         }
-
-
-                        @foreach (var row in groupData)
+                        @if (ShowCheckbox)
                         {
-                            <tr class="@(Columns.Any(c => !c.Visible) ? "expandable" : "")" @onclick="@(() => { if (ExpandedRows.Contains(row.GetHashCode())) { ExpandedRows.Remove(row.GetHashCode()); } else { ExpandedRows.Add(row.GetHashCode()); } })">
-                                @if (Columns.Any(c => !c.Visible) || ShowCheckbox)
-                                {
-                                    <td>
-                                        @if (Columns.Any(c => !c.Visible))
-                                        {
-
-                                            if (ExpandedRows.Contains(row.GetHashCode()))
-                                            {
-                                                @ExpandedTemplate
-                                            }
-                                            else
-                                            {
-                                                @CollapsedTemplate
-                                            }
-                                        }
-                                        @if (ShowCheckbox)
-                                        {
-                                            <input type="checkbox" checked="@(isItemSelected(row))" @onchange="async eventArgs => { await selectItemAsync(row, eventArgs.Value); }" />
-                                        }
-                                    </td>
-                                }
-                                @foreach (var column in Columns)
-                                {
-                                    if (column.Template == null)
-                                    {
-                                        string stringValue = "";
-
-                                        if (column.Format == null)
-                                        {
-                                            stringValue = TypeDescriptor.GetProperties(row)[column.Field].GetValue(row)?.ToString();
-                                        }
-                                        else
-                                        {
-                                            stringValue = string.Format(column.Format, TypeDescriptor.GetProperties(row)[column.Field].GetValue(row));
-                                        }
-                                        <td class="@column.Class  @getSignClass(column,stringValue) @column.DataClass">@stringValue</td>
-                                    }
-                                    else
-                                    {
-                                        <td class="@column.Class @column.DataClass">@column.Template(row)</td>
-                                    }
-                                }
-                            </tr>
-                            <HiddenRows Columns="@Columns" ExpandedRows="@ExpandedRows" ShowCheckbox="@ShowCheckbox" Row="@row"></HiddenRows>
+                            <input type="checkbox" checked="@(isItemSelected(row))" @onchange="async eventArgs => { await selectItemAsync(row, eventArgs.Value); }" />
                         }
-                    </tbody>
+                    </td>
+                }
+                @foreach (var column in Columns)
+                {
+                    if (column.Template == null)
+                    {
+                        string stringValue = "";
+
+                        if (column.Format == null)
+                        {
+                            stringValue = TypeDescriptor.GetProperties(row)[column.Field].GetValue(row)?.ToString();
+                        }
+                        else
+                        {
+                            stringValue = string.Format(column.Format, TypeDescriptor.GetProperties(row)[column.Field].GetValue(row));
+                        }
+                        <td class="@column.Class  @getSignClass(column, stringValue) @column.DataClass">@stringValue</td>
+                    }
+                    else
+                    {
+                        <td class="@column.Class @column.DataClass">@column.Template(row)</td>
+                    }
+                }
+            </tr>
+            <HiddenRows Columns="@Columns" ExpandedRows="@ExpandedRows" ShowCheckbox="@ShowCheckbox" Row="@row"></HiddenRows>
+            @if (DetailTemplate != null && ExpandedRows.Contains(row.GetHashCode()))
+            {
+                <tr>
+                    <td colspan="@(Columns.Count(c => c.Visible) + (ShowCheckbox ? 1 : 0)+ (DetailTemplate!=null ? 1 : 0))">
+                        @DetailTemplate(row)
+                    </td>
+                </tr>
+            }
+        }
+        </tbody>
                     @if (ShowGroupFooter)
                     {
                         <tr class="footerrow">
-                            @if (ShowCheckbox || Columns.Any(c => !c.Visible))
+                            @if (ShowCheckbox || Columns.Any(c => !c.Visible || DetailTemplate != null))
                             {
                                 <td></td>
                             }
@@ -244,7 +259,7 @@
         @if (Data == null)
         {
             <tr>
-                <td class="alignCenter" colspan="@(Columns.Where(c => c.Visible).Count() + (ShowCheckbox?1:0) + (Columns.Any(c => c.Visible==false)?1:0))">
+                <td class="alignCenter" colspan="@(Columns.Where(c => c.Visible).Count() + (DetailTemplate != null?1:0) + (ShowCheckbox?1:0) + (Columns.Any(c => c.Visible==false)?1:0))">
                     @NullGridTemplate
                 </td>
             </tr>
@@ -253,7 +268,7 @@
         {
             <tfoot>
                 <tr class="footerrow">
-                    @if (ShowCheckbox || Columns.Any(c => !c.Visible))
+                    @if (ShowCheckbox || Columns.Any(c => !c.Visible) || DetailTemplate != null)
                     {
                         <td></td>
                     }
