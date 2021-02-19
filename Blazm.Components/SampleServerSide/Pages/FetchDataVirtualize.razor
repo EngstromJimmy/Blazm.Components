@@ -40,7 +40,6 @@
 
 @code {
     private WeatherForecast[] forecasts;
-    private BlazmGrid<WeatherForecast> GroupedGrid;
     protected override async Task OnInitializedAsync()
     {
         forecasts = await ForecastService.GetForecastAsync(DateTime.Now,500);

@@ -3,10 +3,11 @@
   <PropertyGroup>
     <TargetFramework>net5.0</TargetFramework>
     <RazorLangVersion>5.0</RazorLangVersion>
-    <LangVersion>9</LangVersion>
+    <LangVersion>latest</LangVersion>
     <Authors>Jimmy Engström</Authors>
     <Description>A collection of Blazor components</Description>
     <Version>0.0.19</Version>
+	  <Nullable>enable</Nullable>
     <PackageProjectUrl>https://github.com/EngstromJimmy/Blazm.Components</PackageProjectUrl>
     <RepositoryUrl>https://github.com/EngstromJimmy/Blazm.Components</RepositoryUrl>
     <PackageTags>moved</PackageTags>

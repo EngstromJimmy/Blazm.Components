@@ -47,7 +47,7 @@ else
                     @{
                         var item = context as WeatherForecast;
                     }
-                    <button class="btn btn-danger" @onclick="@(async () => { await Delete(item); })"><i class="far fa-trash-alt"></i></button>
+                    <button class="btn btn-danger" @onclick="@(() => { Delete(item); })"><i class="far fa-trash-alt"></i></button>
                 </Template>
             </GridColumn>
         </GridColumns>
@@ -64,7 +64,7 @@ else
         await Load();
     }
 
-    protected async Task Delete(WeatherForecast item)
+    protected void Delete(WeatherForecast item)
     {
         forecasts.Remove(item);
     }

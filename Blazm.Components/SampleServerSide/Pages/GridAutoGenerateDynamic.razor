@@ -30,12 +30,12 @@ else
 @code {
     private List<dynamic> forecasts;
 
-    protected override async Task OnInitializedAsync()
+    protected override void OnInitialized()
     {
-        await Load();
+        Load();
     }
 
-    protected async Task Load(DateTime? date = null)
+    protected void Load(DateTime? date = null)
     {
         forecasts = new List<dynamic>();
         for (int i= 0; i < 30; i++)

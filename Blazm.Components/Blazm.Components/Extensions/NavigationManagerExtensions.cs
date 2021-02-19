@@ -5,7 +5,7 @@ namespace Microsoft.AspNetCore.Components
 {
     public static class NavigationManagerExtensions
     {
-        static IJSObjectReference windowmodule;
+        static IJSObjectReference windowmodule = default!;
 
         public static async Task NavigateToNewWindowAsync(this NavigationManager navigator, IJSRuntime jsRuntime, string url, string content)
         {

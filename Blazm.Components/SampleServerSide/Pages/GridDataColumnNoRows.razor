@@ -50,7 +50,7 @@ else
                     @{
                         var item = context as WeatherForecast;
                     }
-                    <button class="btn btn-danger" @onclick="@(async () => { await Delete(item); })"><i class="far fa-trash-alt"></i></button>
+                    <button class="btn btn-danger" @onclick="@(() => { Delete(item); })"><i class="far fa-trash-alt"></i></button>
                 </Template>
             </GridColumn>
         </GridColumns>
@@ -62,17 +62,17 @@ else
     private List<WeatherForecast> forecasts;
     private BlazmGrid<WeatherForecast> MyGrid;
 
-    protected override async Task OnInitializedAsync()
+    protected override void OnInitialized()
     {
-        await Load();
+        Load();
     }
 
-    protected async Task Delete(WeatherForecast item)
+    protected void Delete(WeatherForecast item)
     {
         forecasts.Remove(item);
     }
 
-    protected async Task Load(DateTime? date = null)
+    protected void Load(DateTime? date = null)
     {
         forecasts = new List<WeatherForecast>() ;
     }

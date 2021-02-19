@@ -15,11 +15,11 @@
                         {
                             @if (hiddencolumn.Format == null)
                             {
-                                @Row.GetType().GetProperty(hiddencolumn.Field).GetValue(Row)
+                                @Row.GetType().GetProperty(hiddencolumn.Field)?.GetValue(Row)
                             }
                             else
                             {
-                                @string.Format(hiddencolumn.Format, Row.GetType().GetProperty(hiddencolumn.Field).GetValue(Row))
+                                @string.Format(hiddencolumn.Format, Row.GetType().GetProperty(hiddencolumn.Field)?.GetValue(Row))
                             }
                         }
                         else
@@ -38,7 +38,7 @@
     [Parameter]
     public List<int> ExpandedRows { get; set; } = new List<int>();
     [Parameter]
-    public TItem Row { get; set; }
+    public TItem Row { get; set; } = default!;
     [Parameter]
     public bool ShowCheckbox { get; set; }
 
