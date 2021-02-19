@@ -515,7 +515,7 @@ namespace Blazm.Components
                         for (var i = 0; i < size?.Columns?.Length; i++)
                         {
                             var counter = i;
-                            if (ShowCheckbox || Columns.Any(c => !c.Visible))
+                            if (ShowCheckbox || Columns.Any(c => !c.Visible) || DetailTemplate!=null)
                             {
                                 //Skip the first one
                                 counter = i - 1;
