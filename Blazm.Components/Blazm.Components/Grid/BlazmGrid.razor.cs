@@ -146,6 +146,14 @@ namespace Blazm.Components
         [Parameter]
         public List<TItem> SelectedData { get; set; } = new List<TItem>();
 
+        [Parameter]
+        public RenderFragment<TItem>? DetailTemplate
+        {
+            get;
+            set;
+        } = null;
+
+
         #endregion
 
         [Inject] ResizeListener listener { get; set; } = default!;
