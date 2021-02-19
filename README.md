@@ -281,10 +281,11 @@ If you for example have a DataTable, convert it to dynamic and it will work with
 
 By adding a ```DetailTemplate``` you can show details about the row.
 The details will show up as a row beneath the original row.
+The ```context``` is the row data of the row you expand.
 
 ```Html
 <DetailTemplate>
     Details! @context.Summary
 </DetailTemplate>
 ```
-The ```context``` is the row data of the row you expand.
+
