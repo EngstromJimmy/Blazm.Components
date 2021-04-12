@@ -137,7 +137,7 @@
         {
             if (Type != null && Field != null)
             {
-                var displayattribute = TypeDescriptor.GetReflectionType(this.Type).GetProperty(Field).GetCustomAttribute<DisplayAttribute>();
+                var displayattribute = TypeDescriptor.GetReflectionType(this.Type).GetProperty(Field)?.GetCustomAttribute<DisplayAttribute>();
                 if (title == null && displayattribute != null)
                 {
                     this.title = displayattribute.Name;
