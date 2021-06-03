@@ -37,7 +37,11 @@
                 @temp.Sum(t => t.TemperatureF)
             </FooterTemplate>
         </GridColumn>
-        <GridColumn Field="@nameof(WeatherForecast.Summary)" Priority="0" />
+        <GridColumn Field="@nameof(WeatherForecast.Summary)" Priority="0">
+            <TitleTemplate>
+                Summary (from template)
+            </TitleTemplate>
+        </GridColumn>
     </GridColumns>
 </BlazmGrid>
 

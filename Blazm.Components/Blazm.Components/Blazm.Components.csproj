@@ -6,15 +6,15 @@
     <LangVersion>latest</LangVersion>
     <Authors>Jimmy Engström</Authors>
     <Description>A collection of Blazor components</Description>
-    <Version>1.0.1</Version>
+    <Version>1.0.3</Version>
 	  <Nullable>enable</Nullable>
     <PackageProjectUrl>https://github.com/EngstromJimmy/Blazm.Components</PackageProjectUrl>
     <RepositoryUrl>https://github.com/EngstromJimmy/Blazm.Components</RepositoryUrl>
     <PackageTags>moved</PackageTags>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
     <PackageLicenseExpression>Apache-2.0</PackageLicenseExpression>
-    <AssemblyVersion>1.0.1.0</AssemblyVersion>
-    <FileVersion>1.0.1.0</FileVersion>
+    <AssemblyVersion>1.0.3.0</AssemblyVersion>
+    <FileVersion>1.0.3.0</FileVersion>
   </PropertyGroup>
 
   <ItemGroup>
@@ -31,6 +31,7 @@
     <PackageReference Include="Microsoft.AspNetCore.Components" Version="5.0.0" />
     <PackageReference Include="Microsoft.AspNetCore.Components.Web" Version="5.0.0" />
     <PackageReference Include="NPOI" Version="2.5.1" />
+    <PackageReference Include="UniversalTypeConverter" Version="2.0.0" />
   </ItemGroup>
 
 
@@ -40,15 +41,14 @@
 
 
   <ItemGroup>
-    <Content Update="wwwroot\css\Styles.css">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Update="wwwroot\css\Styles.min.css">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
     <Content Update="wwwroot\Scripts\ResizeTable.js">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
+  </ItemGroup>
+
+
+  <ItemGroup>
+    <Folder Include="wwwroot\css\" />
   </ItemGroup>
 
 </Project>

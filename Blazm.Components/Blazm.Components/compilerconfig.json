@@ -1,7 +1,7 @@
 ﻿[
   {
-    "outputFile": "wwwroot/css/Styles.css",
-    "inputFile": "Styles/Styles.scss"
+    "outputFile": "wwwroot/css/styles.css",
+    "inputFile": "styles/styles.scss"
   },
   {
     "outputFile": "Scripts/JSInterop.es5.js",

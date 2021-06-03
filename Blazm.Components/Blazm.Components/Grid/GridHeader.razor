@@ -1,0 +1,110 @@
+﻿@typeparam TItem
+@namespace Blazm.Components
+<CascadingValue Value="ContainerGrid">
+    <tr>
+        @if (ContainerGrid.ShowCheckbox || ContainerGrid.Columns.Any(c => !c.Visible) || ContainerGrid.DetailTemplate != null)
+        {
+            <th>
+                @if (ContainerGrid.ShowCheckbox)
+                {
+                    <input type="checkbox" @onchange="async eventArgs => { await ContainerGrid.SelectItemsAsync(ContainerGrid.Data.ToList(), eventArgs.Value); }" />
+                }
+            </th>
+        }
+
+        @ContainerGrid.GridColumns
+        @if (ContainerGrid.AutoGenerateColumns && ContainerGrid.Data != null && ContainerGrid.Data.Any())
+        {
+            foreach (PropertyDescriptor propName in TypeDescriptor.GetProperties(FirstRow))
+            {
+                <GridColumn Field="@propName.Name" />
+            }
+        }
+    </tr>
+
+    @if (ContainerGrid.Columns.Any(c => c.CanFilter) && ContainerGrid.ShowFilter)
+    {
+<tr>
+    @if (ContainerGrid.ShowCheckbox || ContainerGrid.Columns.Any(c => !c.Visible) || ContainerGrid.DetailTemplate != null)
+    {
+        <td>
+        </td>
+    }
+    @foreach (var c in ContainerGrid.Columns.Where(c => c.Visible))
+    {
+        if (!string.IsNullOrEmpty(c.Field))
+        {
+
+            @if (c.CanFilter)
+            {
+                <td class="@c.Class @c.HeaderClass">
+                    <ul class="filterlist">
+                        @{ 
+                            filtercounter = 0;
+                            foreach (var f in c.Filters)
+                            {
+                                                <li>
+                                                    @{ 
+                                                        filtercounter++;
+                                                        var type = c.Type.GetProperty(c.Field).PropertyType;
+
+
+                                                    <i class="fas fa-less-than-equal cursor-pointer @(f.FilterType == FilterType.LessThanOrEqual ? "selectedfiltertype" : "filtertype")" @onclick="() => SetFilter(c, f, FilterType.LessThanOrEqual)"></i>
+                                                    <i class="fas fa-greater-than-equal cursor-pointer @(f.FilterType == FilterType.GreaterThanOrEqual ? "selectedfiltertype" : "filtertype")" @onclick="() => SetFilter(c, f, FilterType.GreaterThanOrEqual)"></i>
+                                                    <i class="fas fa-equals cursor-pointer @(f.FilterType == FilterType.Equal ? "selectedfiltertype" : "filtertype")" @onclick="() => SetFilter(c, f, FilterType.Equal)"></i>
+
+                                                        if (type == typeof(string))
+                                                        {
+                                                    <input type="Text" @bind="f.FilterValue" @bind:event="oninput" @onkeyup="c.ApplyFilter" />
+                                                        }
+                                                        else if (type == typeof(DateTime))
+                                                        {
+                                                    <input type="Date" @bind="f.FilterValue" @bind:event="oninput" @onkeyup="c.ApplyFilter" @onchange="c.ApplyFilter" />
+                                                        }
+                                                        else
+                                                        {
+                                                    <input type="number" @bind="f.FilterValue" @bind:event="oninput" @onkeyup="c.ApplyFilter" />
+                                                        }
+                                                        if (filtercounter == 1)
+                                                        {
+                                                    <i class="fas fa-times-circle cursor-pointer" @onclick="@(() => { f.FilterValue = ""; c.ApplyFilter(); })"></i>
+                                                    <i class="fas fa-plus-circle cursor-pointer" @onclick="@(() => { c.Filters.Add(new Filter()); })"></i>
+                                                        }
+                                                        else
+                                                        {
+                                                    <i class="fas fa-minus-circle cursor-pointer" @onclick="@(() => { c.Filters.Remove(f); c.ApplyFilter(); })"></i>
+                                                            }
+                                                        }
+                                                </li>
+                                }
+                        
+                            }
+                    </ul>
+                </td>
+            }
+            else
+            {
+                <td></td>
+            }
+        }
+    }
+</tr>
+}
+</CascadingValue>
+
+
+@code{
+
+    int filtercounter = 0;
+    [CascadingParameter]
+    public BlazmGrid<TItem> ContainerGrid { get; set; } = default!;
+    [Parameter]
+    public TItem? FirstRow { get; set; } = default!;
+
+    private void SetFilter(IGridColumn column, Filter filter,FilterType filterType)
+    {
+        filter.FilterType = filterType;
+        column.ApplyFilter();
+    }
+
+}

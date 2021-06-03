@@ -1,4 +1,5 @@
-﻿using BlazorPro.BlazorSize;
+﻿using Blazm.Components.Extensions;
+using BlazorPro.BlazorSize;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Web.Virtualization;
 using Microsoft.JSInterop;
@@ -11,15 +12,21 @@ using System.Collections.ObjectModel;
 using System.Collections.Specialized;
 using System.ComponentModel;
 using System.Drawing;
+using System.Globalization;
 using System.IO;
 using System.Linq;
+using System.Linq.Expressions;
+using System.Reflection;
 using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
+using TB.ComponentModel;
 
 namespace Blazm.Components
 {
-    public partial class BlazmGrid<TItem>: IGridContainer,IDisposable
+   
+
+    public partial class BlazmGrid<TItem> : IGridContainer, IDisposable
     {
         #region Parameters
         [Parameter]
@@ -135,6 +142,10 @@ namespace Blazm.Components
 
 
         [Parameter]
+        public bool ShowFilter { get; set; }
+
+
+        [Parameter]
         public Func<TItem, object>? GroupBy { get; set; } = null;
 
         [Parameter]
@@ -159,37 +170,39 @@ namespace Blazm.Components
         [Inject] ResizeListener listener { get; set; } = default!;
         [Inject] IJSRuntime jsruntime { get; set; } = default!;
 
-        private bool ShowAllColumns { get; set; }
-        private List<IGridColumn> Columns { get; set; } = new List<IGridColumn>();
-        private List<IGridColumn> AllColumns { get; set; } = new List<IGridColumn>();
-        private List<int> ExpandedRows = new List<int>();
+        public bool ShowAllColumns { get; set; }
+        public List<IGridColumn> Columns { get; set; } = new List<IGridColumn>();
+        public List<IGridColumn> AllColumns { get; set; } = new List<IGridColumn>();
+        public List<int> ExpandedRows = new List<int>();
         string id = Guid.NewGuid().ToString();
         int ContainerClientWidth { get; set; }
         int TableClientWidth { get; set; }
-        private Virtualize<TItem> virtualize { get; set; } = default!;
-        private IEnumerable<TItem> pagedData { get; set; } = default!;
+        public Virtualize<TItem> Virtualize { get; set; } = default!;
+        public IEnumerable<TItem> pagedData { get; set; } = default!;
 
-        protected override async  Task OnParametersSetAsync()
+        protected override async Task OnParametersSetAsync()
         {
             await RefreshDataAsync();
-               
+
             await base.OnParametersSetAsync();
         }
 
 
-        public async Task  RefreshDataAsync()
+        public async Task RefreshDataAsync()
         {
-            if (virtualize != null && Data != null)
+            if (Virtualize != null && Data != null)
             {
-                await virtualize.RefreshDataAsync();
+                await Virtualize.RefreshDataAsync();
             }
         }
 
-        private void loadPagedData()
+
+        private async Task loadPagedData()
         {
             if (Data != null)
             {
-                pagedData = Data;
+                pagedData = ApplyFilter(Data);
+
 
                 if (SortField != null)
                 {
@@ -207,9 +220,53 @@ namespace Blazm.Components
                 {
                     pagedData = pagedData.Skip(PageSize * CurrentPage).Take(PageSize).ToList();
                 }
+                StateHasChanged();
             }
         }
 
+
+        private IEnumerable<TItem> ApplyFilter(IEnumerable<TItem> data)
+        {
+            var filtereddata = data;
+            //AddFilter
+            var param = Expression.Parameter(typeof(TItem));
+            foreach (var column in Columns.Where(c => c.Field != null && c.CanFilter && c.Filters.Count>0))
+            {
+                var columnType = typeof(TItem).GetProperty(column.Field)?.PropertyType;
+                if (columnType != null)
+                {
+                    foreach (var f in column.Filters)
+                    {
+                        object? filtervalue = null;
+
+                        try
+                        {
+                            filtervalue = Convert.ChangeType(f.FilterValue, columnType);
+                        }
+                        catch
+                        {
+                            filtervalue = null;
+                        }
+
+                        if (filtervalue != null)
+                        {
+                            var filter = GetExpression<TItem>(column.Field, filtervalue, f.FilterType);
+                            try
+                            {
+                                filtereddata = filtereddata.Where(filter.Compile());
+                            }
+                            catch (Exception ex)
+                            { 
+                            
+                            }
+                            
+                        }
+                    }
+                }
+            }
+            return filtereddata;
+        }
+        
         private async ValueTask<ItemsProviderResult<TItem>> LoadData(ItemsProviderRequest request)
         {
             loadPagedData();
@@ -294,7 +351,7 @@ namespace Blazm.Components
         }
 
 
-        private async Task selectItemsAsync(List<TItem> items, object selected)
+        public async Task SelectItemsAsync(List<TItem> items, object selected)
         {
             foreach (var item in items)
             {
@@ -314,7 +371,7 @@ namespace Blazm.Components
             StateHasChanged();
         }
 
-        private async Task selectItemAsync(TItem item, object selected)
+        public async Task SelectItemAsync(TItem item, object selected)
         {
             if ((bool)selected)
             {
@@ -328,14 +385,14 @@ namespace Blazm.Components
             StateHasChanged();
         }
 
-        private bool isItemSelected(TItem item)
+        public bool IsItemSelected(TItem item)
         {
             return SelectedData.Contains(item);
         }
 
-       
 
-        private string getSignClass(IGridColumn column, string value)
+
+        public string GetSignClass(IGridColumn column, string value)
         {
             if (column.HighlightSign)
             {
@@ -378,7 +435,7 @@ namespace Blazm.Components
             await RefreshDataAsync();
         }
 
-        protected async Task  NextPage()
+        protected async Task NextPage()
         {
             if ((CurrentPage * PageSize) + PageSize < Data.Count())
             {
@@ -386,11 +443,29 @@ namespace Blazm.Components
             }
             await RefreshDataAsync();
         }
-        
+
+        public int VisibleColumns => Columns.Where(c => c.Visible).Count() + (ShowCheckbox ? 1 : 0) + (DetailTemplate != null ? 1 : 0) + (Columns.Any(c => c.Visible == false) ? 1 : 0);
+
         void IGridContainer.AddColumn(IGridColumn column)
         {
 
-            column.Id = column.Field + column.Template?.GetHashCode() + column.Format?.GetHashCode();
+
+            if (column.Field == null && column.Id == null)
+            {
+                if (GroupBy == null)
+                {
+                    column.Id = Guid.NewGuid().ToString();
+                }
+                else
+                {
+                    throw new Exception("Field and Id can not be null");
+                }
+            }
+
+            if (column.Field != null)
+            {
+                column.Id = column.Field + column.Format?.GetHashCode();
+            }
 
             var col = Columns.FirstOrDefault(c => c.Id == column.Id);
             column.Type = typeof(TItem);
@@ -438,9 +513,10 @@ namespace Blazm.Components
 
         protected async override Task OnAfterRenderAsync(bool firstRender)
         {
-            await RefreshDataAsync();
+            
             if (firstRender)
             {
+                await RefreshDataAsync();
                 listener.OnResized += WindowResized;
             }
             await base.OnAfterRenderAsync(firstRender);
@@ -515,7 +591,7 @@ namespace Blazm.Components
                         for (var i = 0; i < size?.Columns?.Length; i++)
                         {
                             var counter = i;
-                            if (ShowCheckbox || Columns.Any(c => !c.Visible) || DetailTemplate!=null)
+                            if (ShowCheckbox || Columns.Any(c => !c.Visible) || DetailTemplate != null)
                             {
                                 //Skip the first one
                                 counter = i - 1;
@@ -542,11 +618,62 @@ namespace Blazm.Components
             while (resizeAgain);
         }
 
+        public async Task ApplyFilter()
+        {
+            StateHasChanged();
+            await RefreshDataAsync();
+        }
+
         class TableSize
         {
             public int[] Columns { get; set; } = Array.Empty<int>();
             public int TableClientWidth { get; set; }
             public int ContainerClientWidth { get; set; }
+        }
+
+        static Expression<Func<T, bool>> GetExpression<T>(string propertyName, object filterValue,FilterType filterType)
+        {
+            var parameterExp = Expression.Parameter(typeof(T));
+            var propertyExp = Expression.Property(parameterExp, propertyName);
+            var someValue = Expression.Constant(filterValue, propertyExp.Type);
+
+
+            if ((filterType == FilterType.Equal && propertyExp.Type == typeof(string)) || propertyExp.Type == typeof(string))
+            {
+                MethodInfo method = typeof(ObjectExtensions).GetMethod("ContainsExt", BindingFlags.Static | BindingFlags.Public | BindingFlags.NonPublic, null, new[] { propertyExp.Type, typeof(string) }, null);
+                var containsMethodExp = Expression.Call(null, method, propertyExp, someValue);
+
+                return Expression.Lambda<Func<T, bool>>(containsMethodExp, parameterExp);
+            }
+            else if ((filterType == FilterType.Equal && propertyExp.Type == typeof(DateTime)))
+            {
+                const string dateFormat = "yyyy-MM-dd HH:mm";
+                var parsedDate = DateTime.ParseExact(((DateTime)filterValue).ToString(dateFormat), dateFormat, CultureInfo.InvariantCulture);
+
+                var dayStart = new DateTime(parsedDate.Year, parsedDate.Month, parsedDate.Day, 0, 0, 0, 0);
+                var dayEnd = new DateTime(parsedDate.Year, parsedDate.Month, parsedDate.Day, 23, 59, 59, 999);
+
+                var left = Expression.Lambda<Func<T, bool>>(Expression.GreaterThanOrEqual(propertyExp, Expression.Constant(dayStart)), parameterExp);
+                var right = Expression.Lambda<Func<T, bool>>(Expression.LessThanOrEqual(propertyExp, Expression.Constant(dayEnd)), parameterExp);
+
+                return left.And(right); 
+            }
+            else if ((filterType == FilterType.Equal && propertyExp.Type !=  typeof(string)))
+            {
+                var body = Expression.Equal(propertyExp, someValue);
+                return Expression.Lambda<Func<T, bool>>(body, parameterExp);
+            }
+            else if(filterType == FilterType.GreaterThanOrEqual)
+            {
+                var body = Expression.GreaterThanOrEqual(propertyExp, someValue);
+                return Expression.Lambda<Func<T, bool>>(body, parameterExp);
+            }
+            else 
+            {
+                var body = Expression.LessThanOrEqual(propertyExp, someValue);
+                return Expression.Lambda<Func<T, bool>>(body, parameterExp);
+
+            }
         }
     }
 }

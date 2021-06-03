@@ -69,9 +69,12 @@ This adds the necessary things for the grid to be responsive.
 
 **In Pages/_Host.cshtml**
 
-1. Inside the head tag add ``` <link href="_content/Blazm.Components/css/styles.min.css" rel="stylesheet" /> ```
+1. Inside the head tag add:
+ ``` html 
+ <link href="_content/Blazm.Components/css/styles.min.css" rel="stylesheet" /> 
+```
 2. After the script tag (towards the bottom of the page) referring to blazor.server.js.
-Add 
+Add:
 ``` html 
 <script src="_content/BlazorPro.BlazorSize/blazorSize.min.js"></script>
 ```

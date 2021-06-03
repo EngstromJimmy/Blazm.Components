@@ -1,5 +1,7 @@
 ﻿using Microsoft.AspNetCore.Components;
 using System;
+using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace Blazm.Components
 {
@@ -11,6 +13,14 @@ namespace Blazm.Components
             set;
         }
 
+        List<Filter> Filters
+        {
+            get;
+            set;
+        }
+
+        Task ApplyFilter();
+        
         bool Exportable
         {
             get;
@@ -104,6 +114,12 @@ namespace Blazm.Components
         bool CanSort
         { 
             get; 
+        }
+
+        bool CanFilter
+        {
+            get;
+            set;
         }
 
         public RenderFragment<object> FooterTemplate

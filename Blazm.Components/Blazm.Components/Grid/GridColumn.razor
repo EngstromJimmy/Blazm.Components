@@ -1,9 +1,31 @@
 ﻿@namespace Blazm.Components
 @implements IGridColumn
 
-<th @onclick="@SortColumn" class="@Class @HeaderClass @(ContainerGrid.Sortable && CanSort ? "cursor-pointer" : "")">@Title @if (CanSort) {<span class="fa @(GetSortStyle(this.Field))"></span>}</th>
+<th class="@Class @HeaderClass">
+    <span @onclick="@SortColumn" class="@(CanSort ? "cursor-pointer" : "")">
+        @if (TitleTemplate != null)
+        {
+            @TitleTemplate
+        }
+        else
+        {
+            @Title
+        }
+    </span>
+    @if (CanSort)
+    {
+        <span class="fa @(GetSortStyle(this.Field)) @(CanSort ? "cursor-pointer" : "")" @onclick="@SortColumn"></span>
+    }
+
+    @if (CanFilter)
+    {
+        <span class="fa @(GetFilterStyle(this.Field)) @(CanFilter ? "cursor-pointer" : "")" @onclick="@(async () => { ContainerGrid.ShowFilter = !ContainerGrid.ShowFilter; await ContainerGrid.ApplyFilter(); })"></span>
+    }
+</th>
 
 @code {
+
+    public List<Filter> Filters { get; set; } = new List<Filter> { new Filter()};
 
     [CascadingParameter]
     private IGridContainer ContainerGrid { get; set; }
@@ -15,6 +37,9 @@
         get;
         set;
     }
+
+    [Parameter]
+    public bool CanFilter { get; set; } = false;
 
     [Parameter]
     public int Priority
@@ -54,9 +79,19 @@
         }
     }
 
+    public async Task ApplyFilter()
+    {
+        if (CanFilter)
+        {
+            if (ContainerGrid != null)
+            {
+                await ContainerGrid.ApplyFilter();
+            }
+        }
+    }
 
     [Parameter]
-    public string Id { get;set; }
+    public string? Id { get; set; } = null;
 
     public bool Visible
     {
@@ -152,33 +187,21 @@
     }
 
     [Parameter]
-    public RenderFragment<object> Template
-    {
-        get;
-        set;
-    }
+    public RenderFragment<object> Template { get; set; }
+
+    [Parameter]
+    public RenderFragment? TitleTemplate { get; set; }
 
 
     [Parameter]
-    public RenderFragment<object> FooterTemplate
-    {
-        get;
-        set;
-    }
+    public RenderFragment<object> FooterTemplate { get; set; }
 
     [Parameter]
-    public bool Exportable
-    {
-        get;
-        set;
-    } = true;
+    public bool Exportable { get; set; } = true;
 
     [Parameter]
-    public RenderFragment<object> GroupFooterTemplate
-    {
-        get;
-        set;
-    }
+    public RenderFragment<object> GroupFooterTemplate { get; set; }
+
 
 
     protected override void OnInitialized()
@@ -206,5 +229,15 @@
         {
             return "fa-sort-down";
         }
+    }
+
+    private string GetFilterStyle(string columnName)
+    {
+        if (CanFilter)
+        {
+            return "fa-filter";
+        }
+
+        return string.Empty;
     }
 }

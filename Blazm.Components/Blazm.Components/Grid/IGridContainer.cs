@@ -1,4 +1,6 @@
-﻿using System.Threading.Tasks;
+﻿using Microsoft.AspNetCore.Components;
+using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace Blazm.Components
 {
@@ -9,6 +11,8 @@ namespace Blazm.Components
         void RemoveColumn(IGridColumn column);
 
         Task Sort(IGridColumn column);
+
+        Task ApplyFilter();
         string SortField
         {
             get;
@@ -21,9 +25,17 @@ namespace Blazm.Components
             set;
         }
 
+        bool ShowFilter
+        {
+            get;
+            set;
+        } 
+
+
         System.ComponentModel.ListSortDirection SortDirection
         {
             get; set;
         }
+
     }
 }

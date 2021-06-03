@@ -18,8 +18,8 @@
 <h2>BlazmGrid</h2>
 <BlazmGrid Data="forecasts" PageSize="10" Sortable="true" SortField="@nameof(WeatherForecast.Date)" ShowFooter="true">
     <GridColumns>
-        <GridColumn Field="@nameof(WeatherForecast.Date)" Format="{0:d}" Priority="3" />
-        <GridColumn Field="@nameof(WeatherForecast.TemperatureC)" HighlightSign="true" Priority="1" Class="alignRight">
+        <GridColumn CanFilter="true" Field="@nameof(WeatherForecast.Date)" Format="{0:d}" Priority="3" />
+        <GridColumn CanFilter="true" Field="@nameof(WeatherForecast.TemperatureC)" HighlightSign="true" Priority="1" Class="alignRight">
             <FooterTemplate>
                 @{
                     var temp = context as List<WeatherForecast>;
@@ -35,7 +35,7 @@
                 @temp.Sum(t => t.TemperatureF)
             </FooterTemplate>
         </GridColumn>
-        <GridColumn Field="@nameof(WeatherForecast.Summary)" Priority="0" />
+        <GridColumn CanFilter="true" Field="@nameof(WeatherForecast.Summary)" Priority="0" />
     </GridColumns>
 </BlazmGrid>
 
@@ -46,7 +46,7 @@
         <h5>@context</h5>
     </GroupHeader>
     <GridColumns>
-        <GridColumn Field="@nameof(WeatherForecast.Date)" Format="{0:d}" Priority="3" />
+        <GridColumn CanFilter="true" Field="@nameof(WeatherForecast.Date)" Format="{0:d}" Priority="3" />
         <GridColumn Field="@nameof(WeatherForecast.TemperatureC)" HighlightSign="true" Priority="1" Class="alignRight">
             <FooterTemplate>
                 @{
@@ -76,7 +76,7 @@
                 @Math.Round(temp.Average(t => t.TemperatureF), 2)
             </GroupFooterTemplate>
         </GridColumn>
-        <GridColumn Field="@nameof(WeatherForecast.Summary)" Priority="0" />
+        <GridColumn CanFilter="true" Field="@nameof(WeatherForecast.Summary)" Priority="0" />
         <GridColumn Field="@nameof(WeatherForecast.Location)" Priority="5" />
     </GridColumns>
 </BlazmGrid>

@@ -13,7 +13,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SampleServerSide", "SampleServerSide\SampleServerSide.csproj", "{206836A1-C4D5-4A4A-BF54-44D909B6F16A}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Blazm.Components.Tests", "Blazm.Components.Tests\Blazm.Components.Tests.csproj", "{5306218D-0290-4180-902D-53278DA58C04}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Blazm.Components.Tests", "Blazm.Components.Tests\Blazm.Components.Tests.csproj", "{5306218D-0290-4180-902D-53278DA58C04}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

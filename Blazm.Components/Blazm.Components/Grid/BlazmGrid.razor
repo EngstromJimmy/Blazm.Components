@@ -6,318 +6,175 @@
 @using System.Dynamic
 @using Blazm.Components.Dynamic
 @using Microsoft.JSInterop
-
-<div id="@("tablecontainer" + id)">
-    <table class="table-striped table @(ShowAllColumns?"countableClientWidth":"")" id="@("table" + id)">
-        @{
-            TItem firstRow = default!;
-            if (Data != null)
-            {
-                firstRow = Data.FirstOrDefault();
-                if (AutoGenerateColumns && Data != null && Data.Any())
+<CascadingValue Value="@this">
+    <div id="@("tablecontainer" + id)">
+        <table class="table-striped table @(ShowAllColumns?"countableClientWidth":"")" id="@("table" + id)">
+            @{
+                TItem firstRow = default!;
+                if (Data != null && Data.Count() > 0)
                 {
-                    //Check if type is expandoObject
-
-                    if (firstRow is System.Dynamic.ExpandoObject)
+                    firstRow = Data.First();
+                    if (AutoGenerateColumns && Data != null && Data.Any())
                     {
-                        TypeDescriptor.AddProvider(new ExpandoObjectTypeDescriptionProvider(), typeof(ExpandoObject));
+                        //Check if type is expandoObject
+
+                        if (firstRow is System.Dynamic.ExpandoObject)
+                        {
+                            TypeDescriptor.AddProvider(new ExpandoObjectTypeDescriptionProvider(), typeof(ExpandoObject));
+                        }
                     }
                 }
             }
-        }
 
-        @if (GroupBy == null)
-        {
-            <thead>
-                <tr>
-                    @if (ShowCheckbox || Columns.Any(c => !c.Visible) || DetailTemplate!=null)
+            @if (GroupBy == null)
+            {
+                <thead>
+                    <GridHeader FirstRow="firstRow" />
+                </thead>
+                <tbody>
+                    @if (Data != null)
                     {
-                        <th>
-                            @if (ShowCheckbox)
-                            {
-                                <input type="checkbox" @onchange="async eventArgs => { await selectItemsAsync(Data.ToList(), eventArgs.Value); }" />
-                            }
-                        </th>
+                        <Virtualize @ref="Virtualize" TItem="TItem" Context="row" ItemsProvider="LoadData">
+                            <GridDataRow Row="row" />
+                        </Virtualize>
                     }
-                    <CascadingValue Value="@this">
-                        @GridColumns
-                        @if (AutoGenerateColumns && Data != null && Data.Any())
-                        {
-                            foreach (PropertyDescriptor propName in TypeDescriptor.GetProperties(firstRow))
-                            {
-                                <GridColumn Field="@propName.Name" />
-                            }
-                        }
-                    </CascadingValue>
-                </tr>
-            </thead>
-            <tbody>
-                @if (Data != null)
+                </tbody>
+            }
+            else
+            {
+                if (Data != null && Data.GroupBy(GroupBy) != null)
                 {
 
-                <Virtualize @ref="virtualize" TItem="TItem" Context="row" ItemsProvider="LoadData">
-                    <tr class="@(Columns.Any(c => !c.Visible) ? "expandable" : "")" @onclick="@(() => { if (ExpandedRows.Contains(row.GetHashCode())) { ExpandedRows.Remove(row.GetHashCode()); } else { ExpandedRows.Add(row.GetHashCode()); } })">
-                        @if (Columns.Any(c => !c.Visible) || ShowCheckbox || DetailTemplate != null)
-                        {
-                            <td>
-                                @if (Columns.Any(c => !c.Visible) || DetailTemplate != null)
-                                {
+                    if (GroupSortField != null)
+                    {
+                        Data = Data.OrderByDescending(x => x.GetType().GetProperty(GroupSortField).GetValue(x, null)).ToList();
+                    }
 
-                                    if (ExpandedRows.Contains(row.GetHashCode()))
+
+
+                    var groupedData = Data.GroupBy(GroupBy);
+                    foreach (var d in groupedData)
+                    {
+                        <tbody>
+                            @if (GroupHeader != null)
+                            {
+                                <tr class="headerrow">
+                                    <td colspan="@VisibleColumns"> @GroupHeader(d.Key)</td>
+                                </tr>
+                            }
+                            <GridHeader FirstRow="firstRow" />
+                            @{
+                                var groupData = d.ToList();
+                                if (SortField != null)
+                                {
+                                    if (SortDirection == ListSortDirection.Descending)
                                     {
-                                        @ExpandedTemplate
+                                        groupData = groupData.OrderByDescending(x => x.GetType().GetProperty(SortField).GetValue(x, null)).ToList();
                                     }
                                     else
                                     {
-                                        @CollapsedTemplate
+                                        groupData = groupData.OrderBy(x => x.GetType().GetProperty(SortField).GetValue(x, null)).ToList();
                                     }
                                 }
-                                @if (ShowCheckbox)
-                                {
-                                    <input type="checkbox" checked="@(isItemSelected(row))" @onchange="async eventArgs => { await selectItemAsync(row, eventArgs.Value); }" />
-                                }
-                            </td>
-                        }
-                        @foreach (var column in Columns)
+                            }
+
+
+                            @foreach (var row in ApplyFilter(groupData))
+                            {
+                                <GridDataRow Row="row" />
+                            }
+                        </tbody>
+                        @if (ShowGroupFooter)
                         {
-                            if (column.Template == null)
-                            {
-                                string stringValue = "";
-
-                                if (column.Format == null)
+                            <tr class="footerrow">
+                                @if (ShowCheckbox || Columns.Any(c => !c.Visible || DetailTemplate != null))
                                 {
-                                    stringValue = TypeDescriptor.GetProperties(row)[column.Field].GetValue(row)?.ToString();
+                                    <td></td>
                                 }
-                                else
+                                @foreach (var column in Columns.Where(c => c.Visible))
                                 {
-                                    stringValue = string.Format(column.Format, TypeDescriptor.GetProperties(row)[column.Field].GetValue(row));
+                                    <td class="@column.Class">
+                                        @if (column.GroupFooterTemplate != null)
+                                        {@column.GroupFooterTemplate(d.ToList())}
+                                    </td>
                                 }
-                                <td class="@column.Class @getSignClass(column, stringValue) @column.DataClass ">@stringValue</td>
-                            }
-                            else
-                            {
-                                <td class="@column.Class @column.DataClass">@column.Template(row)</td>
-                            }
+                            </tr>
                         }
-                    </tr>
-                    <HiddenRows Columns="@Columns" ExpandedRows="@ExpandedRows" ShowCheckbox="@ShowCheckbox" Row="@row"></HiddenRows>
-                    @if (DetailTemplate != null && ExpandedRows.Contains(row.GetHashCode()))
-                    {
-                    <tr>
-                        <td colspan="@(Columns.Count(c => c.Visible)+ (ShowCheckbox?1:0) + (DetailTemplate!=null ? 1 : 0))">
-                            @DetailTemplate(row)
-                        </td>
-                    </tr>
                     }
-                </Virtualize>
-                }
-            </tbody>
-        }
-        else
-        {
-            if (Data != null && Data.GroupBy(GroupBy) != null)
-            {
-                if (GroupSortField != null)
-                {
-                    Data = Data.OrderByDescending(x => x.GetType().GetProperty(GroupSortField).GetValue(x, null)).ToList();
-                }
-                var groupedData = Data.GroupBy(GroupBy);
-                foreach (var d in groupedData)
-                {
-    <tbody>
-        @if (GroupHeader != null)
-        {
-            <tr class="headerrow"><td colspan="@(Columns.Where(c => c.Visible).Count() + (ShowCheckbox?1:0) + (DetailTemplate!=null?1:0) + (Columns.Any(c => c.Visible==false)?1:0))"> @GroupHeader(d.Key)</td></tr>
-        }
-        <tr>
-            @if (ShowCheckbox || Columns.Any(c => !c.Visible) || DetailTemplate != null)
-            {
-                <th>
-                    @if (ShowCheckbox)
-                    {
-                        <input type="checkbox" @onchange="async eventArgs => { await selectItemsAsync(d.ToList(), eventArgs.Value); }" />
-                    }
-                </th>
-            }
-            <CascadingValue Value="@this">
-                @GridColumns
-
-
-                @if (AutoGenerateColumns && Data != null && Data.Any())
-                {
-                    foreach (PropertyDescriptor propName in TypeDescriptor.GetProperties(firstRow))
-                    {
-                        <GridColumn Field="@propName.Name" />
-                    }
-                }
-
-
-            </CascadingValue>
-        </tr>
-        @{
-            var groupData = d.ToList();
-            if (SortField != null)
-            {
-                if (SortDirection == ListSortDirection.Descending)
-                {
-                    groupData = groupData.OrderByDescending(x => x.GetType().GetProperty(SortField).GetValue(x, null)).ToList();
-                }
-                else
-                {
-                    groupData = groupData.OrderBy(x => x.GetType().GetProperty(SortField).GetValue(x, null)).ToList();
                 }
             }
-        }
 
-
-        @foreach (var row in groupData)
-        {
-            <tr class="@(Columns.Any(c => !c.Visible) || DetailTemplate != null ? "expandable" : "")" @onclick="@(() => { if (ExpandedRows.Contains(row.GetHashCode())) { ExpandedRows.Remove(row.GetHashCode()); } else { ExpandedRows.Add(row.GetHashCode()); } })">
-                @if (Columns.Any(c => !c.Visible) || ShowCheckbox || DetailTemplate != null)
-                {
-                    <td>
-                        @if (Columns.Any(c => !c.Visible) || DetailTemplate != null)
-                        {
-
-                            if (ExpandedRows.Contains(row.GetHashCode()))
-                            {
-                                @ExpandedTemplate
-                            }
-                            else
-                            {
-                                @CollapsedTemplate
-                            }
-                        }
-                        @if (ShowCheckbox)
-                        {
-                            <input type="checkbox" checked="@(isItemSelected(row))" @onchange="async eventArgs => { await selectItemAsync(row, eventArgs.Value); }" />
-                        }
-                    </td>
-                }
-                @foreach (var column in Columns)
-                {
-                    if (column.Template == null)
-                    {
-                        string stringValue = "";
-
-                        if (column.Format == null)
-                        {
-                            stringValue = TypeDescriptor.GetProperties(row)[column.Field].GetValue(row)?.ToString();
-                        }
-                        else
-                        {
-                            stringValue = string.Format(column.Format, TypeDescriptor.GetProperties(row)[column.Field].GetValue(row));
-                        }
-                        <td class="@column.Class  @getSignClass(column, stringValue) @column.DataClass">@stringValue</td>
-                    }
-                    else
-                    {
-                        <td class="@column.Class @column.DataClass">@column.Template(row)</td>
-                    }
-                }
-            </tr>
-            <HiddenRows Columns="@Columns" ExpandedRows="@ExpandedRows" ShowCheckbox="@ShowCheckbox" Row="@row"></HiddenRows>
-            @if (DetailTemplate != null && ExpandedRows.Contains(row.GetHashCode()))
+            @if ((Data != null && !Data.Any()) || Data == null)
             {
                 <tr>
-                    <td colspan="@(Columns.Count(c => c.Visible) + (ShowCheckbox ? 1 : 0)+ (DetailTemplate!=null ? 1 : 0))">
-                        @DetailTemplate(row)
+                    <td class="alignCenter" colspan="@VisibleColumns">
+                        @if (Data != null && !Data.Any())
+                        {
+                            @EmptyGridTemplate
+                        }
+                        else if (Data == null)
+                        {
+                            @NullGridTemplate
+                        }
                     </td>
                 </tr>
             }
-        }
-        </tbody>
-                    @if (ShowGroupFooter)
-                    {
-                        <tr class="footerrow">
-                            @if (ShowCheckbox || Columns.Any(c => !c.Visible || DetailTemplate != null))
-                            {
-                                <td></td>
-                            }
-                            @foreach (var column in Columns.Where(c => c.Visible))
-                            {
-                                <td class="@column.Class">
-                                    @if (column.GroupFooterTemplate != null)
-                                    {@column.GroupFooterTemplate(d.ToList())}
-                                </td>
-                            }
-                        </tr>
-                    }
-                }
-            }
-        }
 
-        @if (Data != null && !Data.Any())
-        {
-            <tr>
-                <td class="alignCenter" colspan="@(Columns.Where(c => c.Visible).Count() + (ShowCheckbox?1:0) + (Columns.Any(c => c.Visible==false)?1:0))">
-                    @EmptyGridTemplate
-                </td>
-            </tr>
-        }
-
-        @if (Data == null)
-        {
-            <tr>
-                <td class="alignCenter" colspan="@(Columns.Where(c => c.Visible).Count() + (DetailTemplate != null?1:0) + (ShowCheckbox?1:0) + (Columns.Any(c => c.Visible==false)?1:0))">
-                    @NullGridTemplate
-                </td>
-            </tr>
-        }
-        @if (ShowFooter && Data != null)
-        {
-            <tfoot>
-                <tr class="footerrow">
-                    @if (ShowCheckbox || Columns.Any(c => !c.Visible) || DetailTemplate != null)
-                    {
-                        <td></td>
-                    }
-                    @foreach (var column in Columns.Where(c => c.Visible))
-                    {
-                        <td class="@column.Class">
-                            @if (column.FooterTemplate != null)
-                            {@column.FooterTemplate(Data.ToList())}
-                        </td>
-                    }
-                </tr>
-            </tfoot>
-        }
-    </table>
-    @if (PageSize != 0 && Data != null && Data.Count() > PageSize && GroupBy == null)
-    {
-
-        <ul class="pagination">
-            <li class="page-item @(CurrentPage==0?"disabled":"cursor-pointer")"><a class="page-link" @onclick="PreviousPage">@PreviousText</a></li>
-            @if (ShowPageCounter)
+            @if (ShowFooter && Data != null)
             {
-                var itemCount = Data.Count();
-                var totalPageCount = itemCount / PageSize;
-                if (itemCount % PageSize != 0)
-                {
-                    totalPageCount++;
-                }
-                <li class="page-item page-count">@(CurrentPage + 1) / @totalPageCount</li>
+                <tfoot>
+                    <tr class="footerrow">
+                        @if (ShowCheckbox || Columns.Any(c => !c.Visible) || DetailTemplate != null)
+                        {
+                            <td></td>
+                        }
+                        @foreach (var column in Columns.Where(c => c.Visible))
+                        {
+                            <td class="@column.Class">
+                                @if (column.FooterTemplate != null)
+                                {@column.FooterTemplate(Data.ToList())}
+                            </td>
+                        }
+                    </tr>
+                </tfoot>
             }
-            <li class="page-item  @((((CurrentPage * PageSize)+PageSize) < Data.Count())?"cursor-pointer":"disabled")"><a class="page-link" @onclick="NextPage">@NextText</a></li>
-        </ul>
+        </table>
+        @if (PageSize != 0 && Data != null && Data.Count() > PageSize && GroupBy == null)
+        {
+
+            <ul class="pagination">
+                <li class="page-item @(CurrentPage==0?"disabled":"cursor-pointer")"><a class="page-link" @onclick="PreviousPage">@PreviousText</a></li>
+                @if (ShowPageCounter)
+                {
+                    var itemCount = Data.Count();
+                    var totalPageCount = itemCount / PageSize;
+                    if (itemCount % PageSize != 0)
+                    {
+                        totalPageCount++;
+                    }
+                    <li class="page-item page-count">@(CurrentPage + 1) / @totalPageCount</li>
+                }
+                <li class="page-item  @((((CurrentPage * PageSize)+PageSize) < Data.Count())?"cursor-pointer":"disabled")"><a class="page-link" @onclick="NextPage">@NextText</a></li>
+            </ul>
+
+        }
+    </div>
+</CascadingValue>
+    @code
+    {
+        [Parameter]
+        public RenderFragment CollapsedTemplate
+        {
+            get;
+            set;
+        } =@<i class="fas fa-greater-than"></i>;
+
+
+[Parameter]
+public RenderFragment ExpandedTemplate
+{
+get;
+set;
+} = @<i class="fas fa-greater-than fa-rotate-90"></i>;
 
     }
-</div>
-
-@code
-    {
-    [Parameter]
-    public RenderFragment CollapsedTemplate
-    {
-        get;
-        set;
-    } =@<i class="fas fa-greater-than"></i>;
-
-
-    [Parameter]
-    public RenderFragment ExpandedTemplate
-    {
-    get;
-    set;
-    } = @<i class="fas fa-greater-than fa-rotate-90"></i>;
-}

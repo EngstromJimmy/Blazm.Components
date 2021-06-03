@@ -1,0 +1,58 @@
+﻿@typeparam TItem
+@namespace Blazm.Components
+
+<CascadingValue Value="ContainerGrid">
+    <tr class="@(ContainerGrid.Columns.Any(c => !c.Visible) || ContainerGrid.DetailTemplate != null ? "expandable" : "")" @onclick="@(() => { if (ContainerGrid.ExpandedRows.Contains(Row.GetHashCode())) { ContainerGrid.ExpandedRows.Remove(Row.GetHashCode()); } else { ContainerGrid.ExpandedRows.Add(Row.GetHashCode()); } })">
+        @if (ContainerGrid.Columns.Any(c => !c.Visible) || ContainerGrid.ShowCheckbox || ContainerGrid.DetailTemplate != null)
+        {
+            <td>
+                @if (ContainerGrid.Columns.Any(c => !c.Visible) || ContainerGrid.DetailTemplate != null)
+                {
+
+                    if (ContainerGrid.ExpandedRows.Contains(Row.GetHashCode()))
+                    {
+                        @ContainerGrid.ExpandedTemplate
+                    }
+                    else
+                    {
+                        @ContainerGrid.CollapsedTemplate
+                    }
+                }
+                @if (ContainerGrid.ShowCheckbox)
+                {
+                    <input type="checkbox" checked="@(ContainerGrid.IsItemSelected(Row))" @onchange="async eventArgs => { await ContainerGrid.SelectItemAsync(Row, eventArgs.Value); }" />
+                }
+            </td>
+        }
+        @foreach (var column in ContainerGrid.Columns)
+        {
+            if (column.Template == null)
+            {
+                string stringValue = "";
+
+                if (column.Format == null)
+                {
+                    stringValue = TypeDescriptor.GetProperties(Row)[column.Field].GetValue(Row)?.ToString();
+                }
+                else
+                {
+                    stringValue = string.Format(column.Format, TypeDescriptor.GetProperties(Row)[column.Field].GetValue(Row));
+                }
+                <td class="@column.Class  @ContainerGrid.GetSignClass(column, stringValue) @column.DataClass">@stringValue</td>
+            }
+            else
+            {
+                <td class="@column.Class @column.DataClass">@column.Template(Row)</td>
+            }
+        }
+    </tr>
+    <HiddenRows Row="@Row"></HiddenRows>
+</CascadingValue>
+@code {
+
+    [CascadingParameter]
+    public BlazmGrid<TItem> ContainerGrid { get; set; } = default!;
+    [Parameter]
+    public TItem? Row { get; set; } = default!;
+
+}
