@@ -1,0 +1,14 @@
+﻿@page "/SaveAsTest"
+@inject IJSRuntime jsruntime; 
+
+
+<Button @onclick="DownloadFile">Download file</Button>
+
+
+
+@code{
+    protected async void DownloadFile()
+    {
+        await jsruntime.SaveAsFileAsync("apa.txt", new byte[] { 0x74, 0x65, 0x73, 0x74 });
+    }
+}
