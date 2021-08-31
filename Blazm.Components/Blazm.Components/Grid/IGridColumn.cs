@@ -33,6 +33,12 @@ namespace Blazm.Components
             set;
         }
 
+        bool ShowAdvancedFilter
+        {
+            get;
+            set;
+        }
+
         string Class
         {
             get;

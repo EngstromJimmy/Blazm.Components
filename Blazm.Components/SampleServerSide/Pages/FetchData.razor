@@ -14,9 +14,10 @@
 
 <p>This component demonstrates fetching data from a service.</p>
 
-
+<input type="text" @bind="filter" />
 <h2>BlazmGrid</h2>
-<BlazmGrid Data="forecasts" PageSize="10" Sortable="true" SortField="@nameof(WeatherForecast.Date)" ShowFooter="true">
+
+<BlazmGrid Filter="@filter" Data="forecasts" PageSize="10" Sortable="true" SortField="@nameof(WeatherForecast.Date)" ShowFooter="true">
     <GridColumns>
         <GridColumn CanFilter="true" Field="@nameof(WeatherForecast.Date)" Format="{0:d}" Priority="3" />
         <GridColumn CanFilter="true" Field="@nameof(WeatherForecast.TemperatureC)" HighlightSign="true" Priority="1" Class="alignRight">
@@ -81,7 +82,8 @@
     </GridColumns>
 </BlazmGrid>
 
-@code {
+@code { 
+    string filter ="";
     private WeatherForecast[] forecasts;
     private BlazmGrid<WeatherForecast> GroupedGrid;
     protected override async Task OnInitializedAsync()

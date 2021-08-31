@@ -214,6 +214,10 @@
     {
         get { return Field != null; }
     }
+    public bool ShowAdvancedFilter
+    {
+        get; set;
+    } = false;
 
     private string GetSortStyle(string columnName)
     {

@@ -224,7 +224,8 @@ namespace Blazm.Components
             }
         }
 
-
+        [Parameter]
+        public string Filter { get; set; } = "";
         private IEnumerable<TItem> ApplyFilter(IEnumerable<TItem> data)
         {
             var filtereddata = data;
@@ -241,7 +242,14 @@ namespace Blazm.Components
 
                         try
                         {
-                            filtervalue = Convert.ChangeType(f.FilterValue, columnType);
+                            if (!string.IsNullOrEmpty(Filter))
+                            {
+                                filtervalue = Convert.ChangeType(Filter, columnType);
+                            }
+                            else 
+                            {
+                                filtervalue = Convert.ChangeType(f.FilterValue, columnType);
+                            }
                         }
                         catch
                         {
