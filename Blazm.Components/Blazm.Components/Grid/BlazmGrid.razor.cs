@@ -74,6 +74,13 @@ namespace Blazm.Components
             get;
             set;
         } = false;
+        
+        [Parameter]
+        public bool UseVirtualize
+        {
+            get;
+            set;
+        } = false;
 
         [Parameter]
         public bool Sortable
@@ -197,7 +204,7 @@ namespace Blazm.Components
         }
 
 
-        private async Task loadPagedData()
+        private IEnumerable<TItem> loadPagedData()
         {
             if (Data != null)
             {
@@ -220,8 +227,9 @@ namespace Blazm.Components
                 {
                     pagedData = pagedData.Skip(PageSize * CurrentPage).Take(PageSize).ToList();
                 }
-                StateHasChanged();
+                //StateHasChanged();
             }
+            return pagedData;
         }
 
         [Parameter]
@@ -579,51 +587,54 @@ namespace Blazm.Components
         IJSObjectReference resizemodule = default!;
         public async Task ResizeGrid()
         {
-            do
+            if (Columns.Any(c => c.Priority > 0))
             {
-                try
+                do
                 {
-                    resizing = true;
-                    resizeAgain = false;
-                    resizemodule = await jsruntime.InvokeAsync<IJSObjectReference>("import", "/_content/Blazm.Components/scripts/ResizeTable.js");
-                    ShowAllColumns = true;
-                    await InvokeAsync(StateHasChanged);
-
-                    var size = await resizemodule.InvokeAsync<TableSize>("ResizeTable", id, GroupBy != null);
-
-                    ShowAllColumns = false;
-                    await InvokeAsync(StateHasChanged);
-
-                    if (size != null)
+                    try
                     {
-                        for (var i = 0; i < size?.Columns?.Length; i++)
-                        {
-                            var counter = i;
-                            if (ShowCheckbox || Columns.Any(c => !c.Visible) || DetailTemplate != null)
-                            {
-                                //Skip the first one
-                                counter = i - 1;
-                                if (i == 0)
-                                {
-                                    continue;
-                                }
-                            }
-                            Columns[counter].ClientWidth = size.Columns[i];
-                        }
-                        TableClientWidth = size.TableClientWidth;
-                        ContainerClientWidth = size.ContainerClientWidth;
-
-                        await resizeTableAsync();
-
+                        resizing = true;
+                        resizeAgain = false;
+                        resizemodule = await jsruntime.InvokeAsync<IJSObjectReference>("import", "/_content/Blazm.Components/scripts/ResizeTable.js");
+                        ShowAllColumns = true;
                         await InvokeAsync(StateHasChanged);
+
+                        var size = await resizemodule.InvokeAsync<TableSize>("ResizeTable", id, GroupBy != null);
+
+                        ShowAllColumns = false;
+                        await InvokeAsync(StateHasChanged);
+
+                        if (size != null)
+                        {
+                            for (var i = 0; i < size?.Columns?.Length; i++)
+                            {
+                                var counter = i;
+                                if (ShowCheckbox || Columns.Any(c => !c.Visible) || DetailTemplate != null)
+                                {
+                                    //Skip the first one
+                                    counter = i - 1;
+                                    if (i == 0)
+                                    {
+                                        continue;
+                                    }
+                                }
+                                Columns[counter].ClientWidth = size.Columns[i];
+                            }
+                            TableClientWidth = size.TableClientWidth;
+                            ContainerClientWidth = size.ContainerClientWidth;
+
+                            await resizeTableAsync();
+
+                            await InvokeAsync(StateHasChanged);
+                        }
+                    }
+                    finally
+                    {
+                        resizing = false;
                     }
                 }
-                finally
-                {
-                    resizing = false;
-                }
+                while (resizeAgain);
             }
-            while (resizeAgain);
         }
 
         public async Task ApplyFilter()

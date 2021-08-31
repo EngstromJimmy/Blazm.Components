@@ -5,7 +5,7 @@
 .countableClientWidth > tbody > tr > td,
 .countableClientWidth > thead > tr > th {
   display: table-cell !important;
-  opacity: 0; }
+  opacity: 1; }
 
 .page-count {
   position: relative;

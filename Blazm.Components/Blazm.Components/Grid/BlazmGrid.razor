@@ -34,9 +34,19 @@
                 <tbody>
                     @if (Data != null)
                     {
-                        <Virtualize @ref="Virtualize" TItem="TItem" Context="row" ItemsProvider="LoadData">
-                            <GridDataRow Row="row" />
-                        </Virtualize>
+                        if (UseVirtualize)
+                        {
+                            <Virtualize @ref="Virtualize" TItem="TItem" Context="row" ItemsProvider="LoadData">
+                                <GridDataRow Row="row" />
+                            </Virtualize>
+                        }
+                        else
+                        {
+                            foreach (var row in loadPagedData())
+                            {
+                                <GridDataRow Row="row" />
+                            }
+                        }
                     }
                 </tbody>
             }

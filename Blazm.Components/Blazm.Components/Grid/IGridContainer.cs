@@ -19,6 +19,12 @@ namespace Blazm.Components
             set;
         }
 
+        bool UseVirtualize
+        {
+            get;
+            set;
+        }
+
         bool Sortable
         {
             get;
