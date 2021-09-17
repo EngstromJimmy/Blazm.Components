@@ -13,7 +13,7 @@ namespace Blazm.Components
         Task Sort(IGridColumn column);
 
         Task ApplyFilter();
-        string SortField
+        string? SortField
         {
             get;
             set;

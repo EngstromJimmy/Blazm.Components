@@ -1,10 +1,13 @@
 using Blazm.Components;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Localization;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using SampleServerSide.Data;
+using System.Collections.Generic;
+using System.Globalization;
 
 namespace SampleServerSide
 {
@@ -43,7 +46,15 @@ namespace SampleServerSide
                 // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
                 app.UseHsts();
             }
+            var ci = new CultureInfo("sv-SE") { DateTimeFormat = { ShortDatePattern = "yyyy-MM-dd" }, NumberFormat = { NegativeSign = "-" } };
 
+            app.UseRequestLocalization(
+                new RequestLocalizationOptions()
+                {
+                    SupportedCultures = new List<CultureInfo> { ci },
+                    SupportedUICultures = new List<CultureInfo> { ci },
+                    DefaultRequestCulture = new RequestCulture(ci)
+                });
             app.UseHttpsRedirection();
             app.UseStaticFiles();
 

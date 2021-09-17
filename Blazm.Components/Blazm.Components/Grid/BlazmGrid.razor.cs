@@ -213,13 +213,28 @@ namespace Blazm.Components
 
                 if (SortField != null)
                 {
+                    var type = typeof(TItem).GetProperty(SortField)?.PropertyType;
                     if (SortDirection == ListSortDirection.Descending)
                     {
-                        pagedData = pagedData.OrderByDescending(x => x.GetType().GetProperty(SortField)?.GetValue(x, null)).ToList();
+                        if (type == typeof(string))
+                        {
+                            pagedData = pagedData.OrderByDescending(x => (string?)x?.GetType().GetProperty(SortField)?.GetValue(x, null), StringComparer.InvariantCultureIgnoreCase).ToList();
+                        }
+                        else
+                        {
+                            pagedData = pagedData.OrderByDescending(x => x?.GetType().GetProperty(SortField)?.GetValue(x, null)).ToList();
+                        }
                     }
                     else
                     {
-                        pagedData = pagedData.OrderBy(x => x.GetType().GetProperty(SortField)?.GetValue(x, null)).ToList();
+                        if (type == typeof(string))
+                        {
+                            pagedData = pagedData.OrderBy(x => (string?)x?.GetType().GetProperty(SortField)?.GetValue(x, null), StringComparer.InvariantCultureIgnoreCase).ToList();
+                        }
+                        else
+                        {
+                            pagedData = pagedData.OrderBy(x => x?.GetType().GetProperty(SortField)?.GetValue(x, null)).ToList();
+                        }
                     }
                 }
 
@@ -273,7 +288,7 @@ namespace Blazm.Components
                             }
                             catch (Exception ex)
                             { 
-                            
+                                Console.Error.WriteLine(ex.Message);
                             }
                             
                         }
@@ -286,14 +301,15 @@ namespace Blazm.Components
         private async ValueTask<ItemsProviderResult<TItem>> LoadData(ItemsProviderRequest request)
         {
             loadPagedData();
-            int totalRows = 0;
             if (pagedData != null)
             {
-                totalRows = pagedData.Count();
-            }
-            var numberofItems = Math.Min(request.Count, totalRows - request.StartIndex);
+                var totalRows = pagedData.Count();
+                var numberofItems = Math.Min(request.Count, totalRows - request.StartIndex);
 
-            return new ItemsProviderResult<TItem>(pagedData.Skip(request.StartIndex).Take(numberofItems), totalRows);
+                return new ItemsProviderResult<TItem>(pagedData.Skip(request.StartIndex).Take(numberofItems), totalRows);
+            }
+            await Task.CompletedTask;
+            throw new ArgumentNullException("pagedData == null");
         }
 
 
@@ -317,47 +333,48 @@ namespace Blazm.Components
                 Cell.SetCellValue(c.Title);
             }
 
-
-            foreach (var r in Data)
+            if (Data != null)
             {
-                IRow row = worksheet.CreateRow(rownum++);
-                cellnumber = 0;
-                foreach (var column in Columns.Where(d => d.Exportable))
+                foreach (var r in Data)
                 {
-                    ICell Cell = row.CreateCell(cellnumber++);
-
-                    string stringValue = "";
-
-                    if (column.Format == null)
+                    IRow row = worksheet.CreateRow(rownum++);
+                    cellnumber = 0;
+                    foreach (var column in Columns.Where(d => d.Exportable))
                     {
-                        stringValue = r.GetType().GetProperty(column.Field).GetValue(r)?.ToString();
-                    }
-                    else
-                    {
-                        stringValue = string.Format(column.Format, r.GetType().GetProperty(column.Field)?.GetValue(r)?.ToString());
-                    }
+                        ICell Cell = row.CreateCell(cellnumber++);
 
-                    switch (r.GetType().GetProperty(column.Field).PropertyType.Name)
-                    {
+                        string stringValue = "";
 
-                        case "Int32":
-                        case "Int64":
-                        case "Int16":
-                        case "Decimal":
-                        case "Double":
-                            Cell.SetCellValue(Convert.ToDouble(stringValue));
-                            break;
-                        case "DateTime":
-                            Cell.CellStyle = datestyle;
-                            Cell.SetCellValue(Convert.ToDateTime(stringValue));
-                            break;
-                        default:
-                            Cell.SetCellValue(stringValue);
-                            break;
+                        if (column.Format == null)
+                        {
+                            stringValue = r?.GetType().GetProperty(column.Field)?.GetValue(r)?.ToString() ?? "";
+                        }
+                        else
+                        {
+                            stringValue = string.Format(column.Format, r?.GetType().GetProperty(column.Field)?.GetValue(r)?.ToString());
+                        }
+
+                        switch (r?.GetType().GetProperty(column.Field)?.PropertyType.Name)
+                        {
+
+                            case "Int32":
+                            case "Int64":
+                            case "Int16":
+                            case "Decimal":
+                            case "Double":
+                                Cell.SetCellValue(Convert.ToDouble(stringValue));
+                                break;
+                            case "DateTime":
+                                Cell.CellStyle = datestyle;
+                                Cell.SetCellValue(Convert.ToDateTime(stringValue));
+                                break;
+                            default:
+                                Cell.SetCellValue(stringValue);
+                                break;
+                        }
                     }
                 }
             }
-
             MemoryStream ms = new MemoryStream();
             workbook.Write(ms);
             byte[] bytes = ms.ToArray();
@@ -453,11 +470,14 @@ namespace Blazm.Components
 
         protected async Task NextPage()
         {
-            if ((CurrentPage * PageSize) + PageSize < Data.Count())
+            if (Data != null)
             {
-                CurrentPage++;
+                if ((CurrentPage * PageSize) + PageSize < Data.Count())
+                {
+                    CurrentPage++;
+                }
+                await RefreshDataAsync();
             }
-            await RefreshDataAsync();
         }
 
         public int VisibleColumns => Columns.Where(c => c.Visible).Count() + (ShowCheckbox ? 1 : 0) + (DetailTemplate != null ? 1 : 0) + (Columns.Any(c => c.Visible == false) ? 1 : 0);
@@ -563,10 +583,7 @@ namespace Blazm.Components
 #pragma warning restore 1998
 
 
-        void IDisposable.Dispose()
-        {
-            listener.OnResized -= WindowResized;
-        }
+        void IDisposable.Dispose() => listener.OnResized -= WindowResized;
 
         private bool resizing = false;
         private bool resizeAgain = false;

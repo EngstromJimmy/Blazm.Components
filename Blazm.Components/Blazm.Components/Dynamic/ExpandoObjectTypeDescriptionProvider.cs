@@ -16,7 +16,7 @@ namespace Blazm.Components.Dynamic
             
         }
 
-        public override ICustomTypeDescriptor GetTypeDescriptor(Type objectType, object instance)
+        public override ICustomTypeDescriptor? GetTypeDescriptor(Type objectType, object? instance)
         {
             var defaultDescriptor = base.GetTypeDescriptor(objectType, instance);
 

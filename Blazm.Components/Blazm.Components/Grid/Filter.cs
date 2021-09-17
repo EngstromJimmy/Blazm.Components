@@ -9,6 +9,6 @@ namespace Blazm.Components
     public class Filter
     {
         public FilterType FilterType { get; set; }
-        public string FilterValue { get; set; }
+        public string? FilterValue { get; set; }
     }
 }

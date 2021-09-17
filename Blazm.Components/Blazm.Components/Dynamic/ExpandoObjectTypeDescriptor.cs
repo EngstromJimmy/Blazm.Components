@@ -15,22 +15,22 @@ namespace Blazm.Components.Dynamic
             m_Instance = instance as IDictionary<string, object> ?? new Dictionary<string, object>();
         }
 
-        public string GetComponentName()
+        public string? GetComponentName()
         {
             return TypeDescriptor.GetComponentName(this, true);
         }
 
-        public EventDescriptor GetDefaultEvent()
+        public EventDescriptor? GetDefaultEvent()
         {
             return TypeDescriptor.GetDefaultEvent(this, true);
         }
 
-        public string GetClassName()
+        public string? GetClassName()
         {
             return TypeDescriptor.GetClassName(this, true);
         }
 
-        public EventDescriptorCollection GetEvents(Attribute[] attributes)
+        public EventDescriptorCollection GetEvents(Attribute[]? attributes)
         {
             return TypeDescriptor.GetEvents(this, attributes, true);
         }
@@ -45,7 +45,7 @@ namespace Blazm.Components.Dynamic
             return TypeDescriptor.GetConverter(this, true);
         }
 
-        public object GetPropertyOwner(PropertyDescriptor pd)
+        public object GetPropertyOwner(PropertyDescriptor? pd)
         {
             return m_Instance;
         }
@@ -55,7 +55,7 @@ namespace Blazm.Components.Dynamic
             return TypeDescriptor.GetAttributes(this, true);
         }
 
-        public object GetEditor(Type editorBaseType)
+        public object? GetEditor(Type editorBaseType)
         {
             return TypeDescriptor.GetEditor(this, editorBaseType, true);
         }
@@ -70,7 +70,7 @@ namespace Blazm.Components.Dynamic
             return ((ICustomTypeDescriptor)this).GetProperties(new Attribute[0]);
         }
 
-        public PropertyDescriptorCollection GetProperties(Attribute[] attributes)
+        public PropertyDescriptorCollection GetProperties(Attribute[]? attributes)
         {
             return new PropertyDescriptorCollection(
                 m_Instance.Keys

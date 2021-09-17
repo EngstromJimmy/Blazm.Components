@@ -13,7 +13,7 @@ namespace SampleServerSide.Data
 
         private static readonly string[] Locations = new[]
         {
-            "Central City", "Duckburg", "Gotham City", "Metropolis", "Star City", "Wakanda"
+            "Central City", "Duckburg", "Gotham City", "Metropolis", "Star City", "Wakanda", "Åkersberga"
         };
 
         public Task<WeatherForecast[]> GetForecastAsync(DateTime startDate,int numerofitems=50)
