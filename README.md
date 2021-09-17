@@ -292,3 +292,16 @@ The ```context``` is the row data of the row you expand.
 </DetailTemplate>
 ```
 
+### Filtering
+There are built-in filtering that we can activate by adding the ```CanFilter``` attribute.
+It will add a filter box near the header and will make sure that if the data is a number the output vill be a number input, a datetime will be a date input and so on.
+The default behaviour is equals, we can also add ```ShowAdvancedFilter``` to the GridColumn to get more options.
+ShowAdvancedFilter is note currently styled in the best possible way.
+```Html
+ <GridColumn CanFilter="true"  .... />
+```
+![Blazm](BlazmFilter.gif)
+
+### Disable Virtualize
+
+Use the parameter ```UseVirtualize="false"``` to turn off virtualization, the grid will then display the content using a foreach loop.
