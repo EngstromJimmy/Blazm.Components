@@ -55,6 +55,9 @@ namespace Blazm.Components
         } = 0;
 
         [Parameter]
+        public EventCallback<int> CurrentPageChanged { get; set; }
+
+        [Parameter]
         public bool ShowCheckbox
         {
             get;
@@ -80,7 +83,7 @@ namespace Blazm.Components
         {
             get;
             set;
-        } = false;
+        } = true;
 
         [Parameter]
         public bool Sortable
@@ -151,12 +154,17 @@ namespace Blazm.Components
         [Parameter]
         public bool ShowFilter { get; set; }
 
+        [Parameter]
+        public bool HasData { get; set; }
+
+        [Parameter]
+        public int TotalNumberOfRows { get; set; }
 
         [Parameter]
         public Func<TItem, object>? GroupBy { get; set; } = null;
 
         [Parameter]
-        public ItemsProviderDelegate<TItem> ItemsProvider { get; set; } = default!;
+        public ItemsProviderDelegate<TItem>? ItemsProvider { get; set; } = null;
 
         [Parameter]
         public IEnumerable<TItem>? Data { get; set; }
@@ -189,7 +197,15 @@ namespace Blazm.Components
 
         protected override async Task OnParametersSetAsync()
         {
-            await RefreshDataAsync();
+            if(ItemsProvider==null)
+            {
+                ItemsProvider = LoadData;
+            }
+            if(Data!=null)
+            {
+                HasData = true;
+            }
+            
 
             await base.OnParametersSetAsync();
         }
@@ -197,7 +213,7 @@ namespace Blazm.Components
 
         public async Task RefreshDataAsync()
         {
-            if (Virtualize != null && Data != null)
+            if (Virtualize != null && TotalNumberOfRows>0)
             {
                 await Virtualize.RefreshDataAsync();
             }
@@ -209,7 +225,7 @@ namespace Blazm.Components
             if (Data != null)
             {
                 pagedData = ApplyFilter(Data);
-
+                TotalNumberOfRows = pagedData.Count();
 
                 if (SortField != null)
                 {
@@ -304,12 +320,12 @@ namespace Blazm.Components
             if (pagedData != null)
             {
                 var totalRows = pagedData.Count();
+                HasData = pagedData.Any();
                 var numberofItems = Math.Min(request.Count, totalRows - request.StartIndex);
 
                 return new ItemsProviderResult<TItem>(pagedData.Skip(request.StartIndex).Take(numberofItems), totalRows);
             }
-            await Task.CompletedTask;
-            throw new ArgumentNullException("pagedData == null");
+            return new ItemsProviderResult<TItem>(new List<TItem>() , 0);
         }
 
 
@@ -464,20 +480,21 @@ namespace Blazm.Components
             if (CurrentPage > 0)
             {
                 CurrentPage--;
+                await CurrentPageChanged.InvokeAsync(CurrentPage);
             }
             await RefreshDataAsync();
         }
 
         protected async Task NextPage()
         {
-            if (Data != null)
+
+            if ((CurrentPage * PageSize) + PageSize < TotalNumberOfRows)
             {
-                if ((CurrentPage * PageSize) + PageSize < Data.Count())
-                {
-                    CurrentPage++;
-                }
-                await RefreshDataAsync();
+                CurrentPage++;
+                await CurrentPageChanged.InvokeAsync(CurrentPage);
             }
+            await RefreshDataAsync();
+            
         }
 
         public int VisibleColumns => Columns.Where(c => c.Visible).Count() + (ShowCheckbox ? 1 : 0) + (DetailTemplate != null ? 1 : 0) + (Columns.Any(c => c.Visible == false) ? 1 : 0);

@@ -1,0 +1,82 @@
+﻿@page "/fetchdatawithcustomload"
+
+@using Blazm.Components
+@using Microsoft.AspNetCore.Components.Web.Virtualization
+@using SampleServerSide.Data
+@inject WeatherForecastService ForecastService
+
+<style>
+    th,td {
+        white-space: nowrap;
+    }
+</style>
+
+<h1>Weather forecast</h1>
+
+<p>This component demonstrates fetching data from a service.</p>
+
+
+<h2>BlazmGrid</h2>
+
+<BlazmGrid @bind-CurrentPage="CurrentPage" TotalNumberOfRows="TotalNumberOfRows" PageSize="PageSize" Sortable="true" SortField="@nameof(WeatherForecast.Date)" ItemsProvider="LoadData">
+    <GridColumns>
+        <GridColumn CanFilter="true" Field="@nameof(WeatherForecast.Date)" Format="{0:d}" Priority="3" />
+        <GridColumn CanFilter="true" Field="@nameof(WeatherForecast.TemperatureC)" HighlightSign="true" Priority="1" Class="alignRight">
+            <FooterTemplate>
+                @{
+                    var temp = context as List<WeatherForecast>;
+                }
+                @temp.Sum(t => t.TemperatureC)
+            </FooterTemplate>
+        </GridColumn>
+        <GridColumn Field="@nameof(WeatherForecast.TemperatureF)" Priority="2" Class="alignRight">
+            <FooterTemplate>
+                @{
+                    var temp = context as List<WeatherForecast>;
+                }
+                @temp.Sum(t => t.TemperatureF)
+            </FooterTemplate>
+        </GridColumn>
+        <GridColumn CanFilter="true" Field="@nameof(WeatherForecast.Summary)" Priority="0" />
+    </GridColumns>
+</BlazmGrid>
+
+
+@code {
+
+
+    public int TotalNumberOfRows { get; set; } = 0;
+    public int CurrentPage { get; set; }= 0;
+    public int PageSize { get; set; }= 10;
+    private async ValueTask<ItemsProviderResult<WeatherForecast>> LoadData(ItemsProviderRequest request)
+    {
+
+        var data = await ForecastService.GetForecastAsync(DateTime.Now);
+        if (data != null)
+        {
+            int requestCount= 0;
+            int startIndex = 0;
+            int rowCount = 0;
+            TotalNumberOfRows = data.Count();
+
+            if (PageSize == 0)//Without paging
+            {
+                requestCount = request.Count;
+                startIndex = request.StartIndex;
+                rowCount = TotalNumberOfRows;
+            }
+            else //With paging we ignore the request
+            {
+                requestCount = PageSize;   //If we are using paging we should always get all items in a page
+                startIndex = CurrentPage * PageSize;
+                rowCount = PageSize;
+            }
+            var numberofItems = Math.Min(requestCount, TotalNumberOfRows - startIndex);
+            StateHasChanged();
+            return new ItemsProviderResult<WeatherForecast>(data.Skip(startIndex).Take(numberofItems), rowCount);
+        }
+        
+        await Task.CompletedTask;
+        throw new ArgumentNullException("No data found");
+    }
+}

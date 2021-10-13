@@ -32,11 +32,11 @@
                     <GridHeader FirstRow="firstRow" />
                 </thead>
                 <tbody>
-                    @if (Data != null)
-                    {
-                        if (UseVirtualize)
+                    @*@if (HasData)
+                    {*@
+                        @if (UseVirtualize)
                         {
-                            <Virtualize @ref="Virtualize" TItem="TItem" Context="row" ItemsProvider="LoadData">
+                            <Virtualize @ref="Virtualize" TItem="TItem" Context="row" ItemsProvider="ItemsProvider">
                                 <GridDataRow Row="row" />
                             </Virtualize>
                         }
@@ -47,7 +47,7 @@
                                 <GridDataRow Row="row" />
                             }
                         }
-                    }
+                    @*}*@
                 </tbody>
             }
             else
@@ -59,8 +59,6 @@
                     {
                         Data = Data.OrderByDescending(x => x.GetType().GetProperty(GroupSortField).GetValue(x, null)).ToList();
                     }
-
-
 
                     var groupedData = Data.GroupBy(GroupBy);
                     foreach (var d in groupedData)
@@ -114,18 +112,19 @@
                 }
             }
 
-            @if ((Data != null && !Data.Any()) || Data == null)
+            @if (!HasData || Data == null)
             {
                 <tr>
                     <td class="alignCenter" colspan="@VisibleColumns">
-                        @if (Data != null && !Data.Any())
-                        {
-                            @EmptyGridTemplate
-                        }
-                        else if (Data == null)
+                        @if (Data == null)
                         {
                             @NullGridTemplate
                         }
+                        else if (!HasData)
+                        {
+                            @EmptyGridTemplate
+                        }
+                        
                     </td>
                 </tr>
             }
@@ -149,22 +148,20 @@
                 </tfoot>
             }
         </table>
-        @if (PageSize != 0 && Data != null && Data.Count() > PageSize && GroupBy == null)
+        @if (PageSize != 0 && TotalNumberOfRows > PageSize && GroupBy == null)
         {
-
             <ul class="pagination">
                 <li class="page-item @(CurrentPage==0?"disabled":"cursor-pointer")"><a class="page-link" @onclick="PreviousPage">@PreviousText</a></li>
                 @if (ShowPageCounter)
                 {
-                    var itemCount = Data.Count();
-                    var totalPageCount = itemCount / PageSize;
-                    if (itemCount % PageSize != 0)
+                    var totalPageCount = TotalNumberOfRows / PageSize;
+                    if (TotalNumberOfRows % PageSize != 0)
                     {
                         totalPageCount++;
                     }
                     <li class="page-item page-count">@(CurrentPage + 1) / @totalPageCount</li>
                 }
-                <li class="page-item  @((((CurrentPage * PageSize)+PageSize) < Data.Count())?"cursor-pointer":"disabled")"><a class="page-link" @onclick="NextPage">@NextText</a></li>
+                <li class="page-item  @((((CurrentPage * PageSize)+PageSize) < TotalNumberOfRows)?"cursor-pointer":"disabled")"><a class="page-link" @onclick="NextPage">@NextText</a></li>
             </ul>
 
         }
