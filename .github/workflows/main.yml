@@ -2,7 +2,7 @@
 
 name: Deploy sample project
 env:
-  PUBLISH_DIR: Blazm.Components/BlazmWebAssemblyDemo/bin/Release/net6.0/wwwroot
+  PUBLISH_DIR: /BlazmWebAssemblyDemo/bin/Release/net6.0/wwwroot
 
 # Controls when the workflow will run
 on:
@@ -35,13 +35,10 @@ jobs:
       - name: Publish application
         run: dotnet publish -c Release Blazm.Components/BlazmWebAssemblyDemo/BlazmWebAssemblyDemo.csproj
         
-      - name: Rewrite base href
-        if: success()
-        uses: SteveSandersonMS/ghaction-rewrite-base-href@v1
-        with:
-          html_path: ${{ env.PUBLISH_DIR }}/index.html
-          base_href: REPOSITORY_NAME
-          
+ 
+      - name: Change base-tag in index.html from / to BlazorGitHubPagesDemo
+        run: sed -i 's/<base href="\/" \/>/<base href="\/Blazm.Components\/" \/>/g' release/wwwroot/index.html
+ 
         # add .nojekyll file to tell GitHub pages to not treat this as a Jekyll project. 
         # Allow files and folders starting with an underscore.
       - name: Add .nojekyll file
