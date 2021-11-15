@@ -47,7 +47,6 @@ Telerik UI for Blazor – Increase productivity and cut cost in half! Use the Te
 
 At this point the library is using [Bootstrap](https://getbootstrap.com/).  
 This might change in the future but for now you will need Bootstrap.  
-It is also using [FontAwesome](https://fontawesome.com/) so make sure you reference that as well.
 
 ### In Startup.cs
 
@@ -69,22 +68,6 @@ This adds the necessary things for the grid to be responsive.
 </BlazmGrid>
 ```
 
-### Add Script and Styles
-
-**In Pages/_Host.cshtml**
-
-1. Inside the head tag add:
- ``` html 
- <link href="_content/Blazm.Components/css/styles.min.css" rel="stylesheet" /> 
-```
-2. After the script tag (towards the bottom of the page) referring to blazor.server.js.
-Add:
-``` html 
-<script src="_content/BlazorPro.BlazorSize/blazorSize.min.js"></script>
-```
-
-**In program.cs**
-1. Add ```webBuilder.UseStaticWebAssets();```
 
 ## Grid Features
 
