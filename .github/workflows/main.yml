@@ -2,7 +2,7 @@
 
 name: Deploy sample project
 env:
-  PUBLISH_DIR: /Blazm.Components/Blazm.Components/BlazmWebAssemblyDemo/bin/Release/net6.0/wwwroot
+  PUBLISH_DIR: Blazm.Components/Blazm.Components/BlazmWebAssemblyDemo/bin/Release/net6.0/wwwroot
 
 # Controls when the workflow will run
 on:
