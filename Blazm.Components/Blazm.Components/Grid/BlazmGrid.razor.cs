@@ -639,7 +639,7 @@ namespace Blazm.Components
                     {
                         resizing = true;
                         resizeAgain = false;
-                        resizemodule = await jsruntime.InvokeAsync<IJSObjectReference>("import", "/_content/Blazm.Components/scripts/ResizeTable.js");
+                        resizemodule = await jsruntime.InvokeAsync<IJSObjectReference>("import", "/_content/Blazm.Components/Scripts/ResizeTable.js");
                         ShowAllColumns = true;
                         await InvokeAsync(StateHasChanged);
 
