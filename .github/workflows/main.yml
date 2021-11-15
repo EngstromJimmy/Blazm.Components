@@ -33,7 +33,7 @@ jobs:
           include-prerelease: true
       
       - name: Publish application
-        run: dotnet publish -c Release Blazm.Components\BlazmWebAssemblyDemo\BlazmWebAssemblyDemo.csproj
+        run: dotnet publish -c Release BlazmWebAssemblyDemo/BlazmWebAssemblyDemo.csproj
         
       - name: Rewrite base href
         if: success()
