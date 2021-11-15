@@ -36,13 +36,13 @@ jobs:
         run: dotnet publish -c Release Blazm.Components/BlazmWebAssemblyDemo/BlazmWebAssemblyDemo.csproj
         
  
-      #- name: Change base-tag in index.html from / to BlazorGitHubPagesDemo
-       # run: sed -i 's/<base href="\/" \/>/<base href="\/Blazm.Components\/" \/>/g' release/wwwroot/index.html
+      - name: Change base-tag in index.html from / to BlazorGitHubPagesDemo
+        run: sed -i 's/<base href="\/" \/>/<base href="\/Blazm.Components\/" \/>/g' ${{ env.PUBLISH_DIR }}/index.html
  
         # add .nojekyll file to tell GitHub pages to not treat this as a Jekyll project. 
         # Allow files and folders starting with an underscore.
-#      - name: Add .nojekyll file
-#        run: touch ${{ env.PUBLISH_DIR }}/.nojekyll
+      - name: Add .nojekyll file
+        run: touch ${{ env.PUBLISH_DIR }}/.nojekyll
         
       - name: Commit to GitHub pages Repo
         if: success()
