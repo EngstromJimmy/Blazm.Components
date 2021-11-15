@@ -78,13 +78,25 @@ namespace Blazm.Components
             set;
         } = false;
         
+        private bool useVirtualize=true;
         [Parameter]
         public bool UseVirtualize
         {
-            get;
-            set;
-        } = true;
+            get
+            {
+                //When using paging the use of Virtualize becomes obsolete so it is not possible to use them together.
+                if (PageSize > 0)
+                {
+                    return false;
+                }
+                else
+                {
+                    return useVirtualize;
+                }
+            }
+            set { useVirtualize = value; }
 
+        }
         [Parameter]
         public bool Sortable
         {
@@ -157,8 +169,6 @@ namespace Blazm.Components
         [Parameter]
         public bool HasData { get; set; }
 
-        [Parameter]
-        public int TotalNumberOfRows { get; set; }
 
         [Parameter]
         public Func<TItem, object>? GroupBy { get; set; } = null;
@@ -193,7 +203,7 @@ namespace Blazm.Components
         int ContainerClientWidth { get; set; }
         int TableClientWidth { get; set; }
         public Virtualize<TItem> Virtualize { get; set; } = default!;
-        public IEnumerable<TItem> pagedData { get; set; } = default!;
+        private IEnumerable<TItem> pagedData { get; set; } = new List<TItem>();
 
         protected override async Task OnParametersSetAsync()
         {
@@ -201,7 +211,8 @@ namespace Blazm.Components
             {
                 ItemsProvider = LoadData;
             }
-            if(Data!=null)
+            
+            if(Data!=null && Data.Count()>0)
             {
                 HasData = true;
             }
@@ -213,7 +224,7 @@ namespace Blazm.Components
 
         public async Task RefreshDataAsync()
         {
-            if (Virtualize != null && TotalNumberOfRows>0)
+            if (Virtualize != null)
             {
                 await Virtualize.RefreshDataAsync();
             }
@@ -225,7 +236,6 @@ namespace Blazm.Components
             if (Data != null)
             {
                 pagedData = ApplyFilter(Data);
-                TotalNumberOfRows = pagedData.Count();
 
                 if (SortField != null)
                 {
@@ -488,7 +498,7 @@ namespace Blazm.Components
         protected async Task NextPage()
         {
 
-            if ((CurrentPage * PageSize) + PageSize < TotalNumberOfRows)
+            if (Data!=null && (CurrentPage * PageSize) + PageSize < Data.Count())
             {
                 CurrentPage++;
                 await CurrentPageChanged.InvokeAsync(CurrentPage);
@@ -693,7 +703,7 @@ namespace Blazm.Components
 
             if ((filterType == FilterType.Equal && propertyExp.Type == typeof(string)) || propertyExp.Type == typeof(string))
             {
-                MethodInfo method = typeof(ObjectExtensions).GetMethod("ContainsExt", BindingFlags.Static | BindingFlags.Public | BindingFlags.NonPublic, null, new[] { propertyExp.Type, typeof(string) }, null);
+                MethodInfo method = typeof(Extensions.ObjectExtensions).GetMethod("ContainsExt", BindingFlags.Static | BindingFlags.Public | BindingFlags.NonPublic, null, new[] { propertyExp.Type, typeof(string) }, null);
                 var containsMethodExp = Expression.Call(null, method, propertyExp, someValue);
 
                 return Expression.Lambda<Func<T, bool>>(containsMethodExp, parameterExp);

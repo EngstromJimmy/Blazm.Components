@@ -1,20 +1,17 @@
-﻿@page "/fetchdatagrouped"
+﻿@page "/grouped"
 
 @using Blazm.Components
-@using SampleServerSide.Data
+@using BlazmWebAssemblyDemo.Data
 @inject WeatherForecastService ForecastService
 
-<style>
-    th,td {
-        white-space: nowrap;
-    }
-</style>
+<h1>Grouped demo</h1>
 
-
+<p>This is a grouped grid demo</p>
+<p>By adding the <b>GroupedBy</b> property the grid will be grouped.</p>
 
 <h2>BlazmGrid grouped</h2>
-<button class="btn btn-success" @onclick="@(async ()=> { await GroupedGrid.ExportDataAsync("Weather.xlsx","Export","yyyy-mm-dd"); })">Export data to Excel</button>
-<BlazmGrid @ref="GroupedGrid" GroupBy="d=>d.Summary" Data="forecasts" PageSize="10" Sortable="true" SortField="@nameof(WeatherForecast.Date)" ShowFooter="true" ShowGroupFooter="true">
+
+<BlazmGrid GroupBy="d=>d.Summary" Data="forecasts" Sortable="true" SortField="@nameof(WeatherForecast.Date)" ShowFooter="true" ShowGroupFooter="true">
     <GroupHeader>
         <h5>@context</h5>
     </GroupHeader>
@@ -57,7 +54,6 @@
 @code { 
     string filter ="";
     private WeatherForecast[] forecasts;
-    private BlazmGrid<WeatherForecast> GroupedGrid;
     protected override async Task OnInitializedAsync()
     {
         forecasts = await ForecastService.GetForecastAsync(DateTime.Now);

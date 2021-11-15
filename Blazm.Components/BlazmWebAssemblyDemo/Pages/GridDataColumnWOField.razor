@@ -1,0 +1,64 @@
+﻿@page "/griddatacolumnwofield"
+@using Blazm.Components
+@using BlazmWebAssemblyDemo.Data
+@inject WeatherForecastService ForecastService
+
+<h1>Weather forecast</h1>
+
+<p>This component demonstrates fetching data from a service.</p>
+
+@if (forecasts == null)
+{
+    <p><em>Loading...</em></p>
+}
+else
+{
+    <h2>BlazmGrid - Data Column</h2>
+
+    <BlazmGrid @ref="MyGrid" Data="forecasts" PageSize="10" Sortable="true" SortField="@nameof(WeatherForecast.Date)" ShowFooter="true">
+        <GridColumns>
+            <GridColumn Field="@nameof(WeatherForecast.Date)" Format="{0:d}" Priority="3" />
+            <GridColumn Field="@nameof(WeatherForecast.Date)" Format="{0:d}" Priority="3" />
+            <GridColumn Exportable="false">
+                <Template>
+                    @{
+                        var item = context as WeatherForecast;
+                    }
+                    <button class="btn btn-danger" @onclick="@(() => { Delete(item); })"><i class="far fa-trash-alt"></i></button>
+                </Template>
+            </GridColumn>
+
+            <GridColumn Exportable="false">
+                <Template>
+                    @{
+                        var item = context as WeatherForecast;
+                    }
+                    <button class="btn btn-success" @onclick="@(() => { Delete(item); })"><i class="far fa-trash-alt"></i></button>
+                </Template>
+            </GridColumn>
+
+
+        </GridColumns>
+
+    </BlazmGrid>
+}
+
+@code {
+    private List<WeatherForecast> forecasts;
+    private BlazmGrid<WeatherForecast> MyGrid;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await Load();
+    }
+
+    protected void Delete(WeatherForecast item)
+    {
+        forecasts.Remove(item);
+    }
+
+    protected async Task Load(DateTime? date = null)
+    {
+        forecasts = (await ForecastService.GetForecastAsync(date ?? DateTime.Now)).ToList();
+    }
+}

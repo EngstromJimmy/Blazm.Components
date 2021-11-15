@@ -43,43 +43,43 @@
                             filtercounter = 0;
                             foreach (var f in c.Filters)
                             {
-                                                <li>
-                                                    @{ 
-                                                        filtercounter++;
-                                                        var type = c.Type.GetProperty(c.Field).PropertyType;
+                                <li class="filteritem">
+                                    @{ 
+                                        filtercounter++;
+                                        var type = c.Type.GetProperty(c.Field).PropertyType;
 
-                                                    if(c.ShowAdvancedFilter)
-                                                    {
-                                                    <i class="fas fa-less-than-equal cursor-pointer @(f.FilterType == FilterType.LessThanOrEqual ? "selectedfiltertype" : "filtertype")" @onclick="() => SetFilter(c, f, FilterType.LessThanOrEqual)"></i>
-                                                    <i class="fas fa-greater-than-equal cursor-pointer @(f.FilterType == FilterType.GreaterThanOrEqual ? "selectedfiltertype" : "filtertype")" @onclick="() => SetFilter(c, f, FilterType.GreaterThanOrEqual)"></i>
-                                                    <i class="fas fa-equals cursor-pointer @(f.FilterType == FilterType.Equal ? "selectedfiltertype" : "filtertype")" @onclick="() => SetFilter(c, f, FilterType.Equal)"></i>
-                                                    }
-                                                        if (type == typeof(string))
-                                                        {
-                                                    <input type="Text" @bind="f.FilterValue" @bind:event="oninput" @onkeyup="c.ApplyFilter" />
-                                                        }
-                                                        else if (type == typeof(DateTime))
-                                                        {
-                                                    <input type="Date" @bind="f.FilterValue" @bind:event="oninput" @onkeyup="c.ApplyFilter" @onchange="c.ApplyFilter" />
-                                                        }
-                                                        else
-                                                        {
-                                                    <input type="number" @bind="f.FilterValue" @bind:event="oninput" @onkeyup="c.ApplyFilter" />
-                                                        }
-                                                        if(c.ShowAdvancedFilter)
-                                                        {
-                                                            if (filtercounter == 1)
-                                                            {
-                                                                <i class="fas fa-times-circle cursor-pointer" @onclick="@(() => { f.FilterValue = ""; c.ApplyFilter(); })"></i>
-                                                                <i class="fas fa-plus-circle cursor-pointer" @onclick="@(() => { c.Filters.Add(new Filter()); })"></i>
-                                                            }
-                                                            else
-                                                            {
-                                                                <i class="fas fa-minus-circle cursor-pointer" @onclick="@(() => { c.Filters.Remove(f); c.ApplyFilter(); })"></i>
-                                                            }
-                                                        }
-                                                    }
-                                                </li>
+                                    if(c.ShowAdvancedFilter)
+                                    {
+                                    <i class="fas fa-less-than-equal cursor-pointer @(f.FilterType == FilterType.LessThanOrEqual ? "selectedfiltertype" : "filtertype")" @onclick="() => SetFilter(c, f, FilterType.LessThanOrEqual)"></i>
+                                    <i class="fas fa-greater-than-equal cursor-pointer @(f.FilterType == FilterType.GreaterThanOrEqual ? "selectedfiltertype" : "filtertype")" @onclick="() => SetFilter(c, f, FilterType.GreaterThanOrEqual)"></i>
+                                    <i class="fas fa-equals cursor-pointer @(f.FilterType == FilterType.Equal ? "selectedfiltertype" : "filtertype")" @onclick="() => SetFilter(c, f, FilterType.Equal)"></i>
+                                    }
+                                        if (type == typeof(string))
+                                        {
+                                    <input type="Text" @bind="f.FilterValue" @bind:event="oninput" @onkeyup="c.ApplyFilter" />
+                                        }
+                                        else if (type == typeof(DateTime))
+                                        {
+                                    <input type="Date" @bind="f.FilterValue" @bind:event="oninput" @onkeyup="c.ApplyFilter" @onchange="c.ApplyFilter" />
+                                        }
+                                        else
+                                        {
+                                    <input type="number" @bind="f.FilterValue" @bind:event="oninput" @onkeyup="c.ApplyFilter" />
+                                        }
+                                        if(c.ShowAdvancedFilter)
+                                        {
+                                            if (filtercounter == 1)
+                                            {
+                                                <i class="fas fa-times-circle cursor-pointer" @onclick="@(() => { f.FilterValue = ""; c.ApplyFilter(); })"></i>
+                                                <i class="fas fa-plus-circle cursor-pointer" @onclick="@(() => { c.Filters.Add(new Filter()); })"></i>
+                                            }
+                                            else
+                                            {
+                                                <i class="fas fa-minus-circle cursor-pointer" @onclick="@(() => { c.Filters.Remove(f); c.ApplyFilter(); })"></i>
+                                            }
+                                        }
+                                    }
+                                </li>
                                 }
                         
                             }

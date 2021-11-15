@@ -1,0 +1,94 @@
+﻿@page "/fetchdatawithdetails"
+@using Blazm.Components
+@using BlazmWebAssemblyDemo.Data
+@inject WeatherForecastService ForecastService
+
+<h1>Weather forecast</h1>
+
+<p>This component demonstrates fetching data from a service.</p>
+
+
+<h2>BlazmGrid</h2>
+<BlazmGrid Data="forecasts"  PageSize="10" Sortable="true" SortField="@nameof(WeatherForecast.Date)" ShowFooter="true">
+    <DetailTemplate>
+        Details! @context.Summary
+    </DetailTemplate>
+    <GridColumns>
+        <GridColumn Field="@nameof(WeatherForecast.Date)" Format="{0:d}" Priority="3" />
+        <GridColumn Field="@nameof(WeatherForecast.TemperatureC)" HighlightSign="true" Priority="1" Class="alignRight">
+            <FooterTemplate>
+                @{
+                    var temp = context as List<WeatherForecast>;
+                }
+                @temp.Sum(t => t.TemperatureC)
+            </FooterTemplate>
+        </GridColumn>
+        <GridColumn Field="@nameof(WeatherForecast.TemperatureF)" Priority="2" Class="alignRight">
+            <FooterTemplate>
+                @{
+                    var temp = context as List<WeatherForecast>;
+                }
+                @temp.Sum(t => t.TemperatureF)
+            </FooterTemplate>
+        </GridColumn>
+        <GridColumn Field="@nameof(WeatherForecast.Summary)" Priority="0">
+            <TitleTemplate>
+                Summary (from template)
+            </TitleTemplate>
+        </GridColumn>
+    </GridColumns>
+</BlazmGrid>
+
+<h2>BlazmGrid grouped</h2>
+<button class="btn btn-success" @onclick="@(async ()=> { await GroupedGrid.ExportDataAsync("Weather.xlsx","Export","yyyy-mm-dd"); })">Export data to Excel</button>
+<BlazmGrid @ref="GroupedGrid" GroupBy="d=>d.Summary" Data="forecasts" PageSize="10" Sortable="true" SortField="@nameof(WeatherForecast.Date)" ShowFooter="true" ShowGroupFooter="true">
+    <DetailTemplate>
+        Details! @context.Summary
+    </DetailTemplate>
+    <GroupHeader>
+        <h5>@context</h5>
+    </GroupHeader>
+    <GridColumns>
+        <GridColumn Field="@nameof(WeatherForecast.Date)" Format="{0:d}" Priority="3" />
+        <GridColumn Field="@nameof(WeatherForecast.TemperatureC)" HighlightSign="true" Priority="1" Class="alignRight">
+            <FooterTemplate>
+                @{
+                    var temp = context as List<WeatherForecast>;
+                }
+                @temp.Sum(t => t.TemperatureC)
+            </FooterTemplate>
+
+            <GroupFooterTemplate>
+                @{ //Context contains all the WeatherForecast within the group
+                    var temp = context as List<WeatherForecast>;
+                }
+                @Math.Round(temp.Average(t => t.TemperatureC), 2)
+            </GroupFooterTemplate>
+        </GridColumn>
+        <GridColumn Field="@nameof(WeatherForecast.TemperatureF)" Priority="2" Class="alignRight">
+            <FooterTemplate>
+                @{
+                    var temp = context as List<WeatherForecast>;
+                }
+                @Math.Round(temp.Average(t => t.TemperatureF), 2)
+            </FooterTemplate>
+            <GroupFooterTemplate>
+                @{
+                    var temp = context as List<WeatherForecast>;
+                }
+                @Math.Round(temp.Average(t => t.TemperatureF), 2)
+            </GroupFooterTemplate>
+        </GridColumn>
+        <GridColumn Field="@nameof(WeatherForecast.Summary)" Priority="0" />
+        <GridColumn Field="@nameof(WeatherForecast.Location)" Priority="5" />
+    </GridColumns>
+</BlazmGrid>
+
+@code {
+    private WeatherForecast[] forecasts;
+    private BlazmGrid<WeatherForecast> GroupedGrid;
+    protected override async Task OnInitializedAsync()
+    {
+        forecasts = await ForecastService.GetForecastAsync(DateTime.Now);
+    }
+}

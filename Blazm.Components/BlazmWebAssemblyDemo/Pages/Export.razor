@@ -1,0 +1,29 @@
+﻿@page "/export"
+
+@using Blazm.Components
+@using BlazmWebAssemblyDemo.Data
+@inject WeatherForecastService ForecastService
+
+
+<h1>Export demo</h1>
+<p>This demo shows the build in Excel export</p>
+
+<button class="btn btn-success" @onclick="@(async ()=> { await Grid.ExportDataAsync("Weather.xlsx","Export","yyyy-mm-dd"); })">Export data to Excel</button>
+<BlazmGrid @ref="Grid" Data="forecasts">
+    <GridColumns>
+        <GridColumn CanFilter="true" Field="@nameof(WeatherForecast.Date)" Format="{0:d}" Priority="3" />
+        <GridColumn CanFilter="true" Field="@nameof(WeatherForecast.TemperatureC)" HighlightSign="true" Priority="1" Class="alignRight"/> 
+        <GridColumn Field="@nameof(WeatherForecast.TemperatureF)" Priority="2" Class="alignRight"/>        <GridColumn CanFilter="true" Field="@nameof(WeatherForecast.Summary)" Priority="0" />
+    </GridColumns>
+</BlazmGrid>
+
+
+
+@code {
+    private WeatherForecast[] forecasts;
+    private BlazmGrid<WeatherForecast> Grid;
+    protected override async Task OnInitializedAsync()
+    {
+        forecasts = await ForecastService.GetForecastAsync(DateTime.Now);
+    }
+}

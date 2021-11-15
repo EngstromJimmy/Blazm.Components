@@ -1,0 +1,124 @@
+﻿
+::deep.hiddencell {
+    display: none;
+}
+
+::deep .countableClientWidth > tbody > tr > th,
+::deep .countableClientWidth > tbody > tr > td,
+::deep .countableClientWidth > thead > tr > th {
+    display: table-cell !important;
+    opacity: 1;
+}
+
+::deep .page-count {
+    position: relative;
+    display: block;
+    padding: .5rem .75rem;
+    margin-left: -1px;
+    line-height: 1.25;
+    border: 1px solid #dee2e6;
+}
+
+::deep .filtertype {
+    color: gray;
+}
+
+::deep .selectedfiltertype {
+    color: black;
+}
+
+::deep .filterlist {
+    padding: 0px;
+    margin: 0px;
+}
+
+::deep .filteritem {
+    list-style: none;
+}
+
+::deep .negative {
+    color: red;
+}
+
+::deep .positive {
+    color: blue;
+}
+
+::deep .alignRight {
+    text-align: right;
+}
+
+::deep .alignLeft {
+    text-align: left;
+}
+
+::deep .alignCenter {
+    text-align: center;
+}
+
+::deep .hidden {
+    display: none;
+}
+
+::deep .cursor-pointer {
+    cursor: pointer;
+}
+
+::deep th, td {
+    white-space: nowrap;
+}
+
+::deep .sort-asc:before {
+    content: '▲';
+}
+
+::deep .sort-desc:before {
+    content: '▼';
+}
+
+::deep .sort-indicator {
+    width: 1.5rem;
+    height: 1rem;
+    opacity: 0.4;
+    flex-shrink: 0;
+    text-align: center;
+    padding-right: 0.2rem;
+    display: inline-block;
+    align-items: center;
+    background-image: url(data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0idXRmLTgiPz48IURPQ1RZUEUgc3ZnIFBVQkxJQyAiLS8vVzNDLy9EVEQgU1ZHIDEuMS8vRU4iICJodHRwOi8vd3d3LnczLm9yZy9HcmFwaGljcy9TVkcvMS4xL0RURC9zdmcxMS5kdGQiPjxzdmcgdmVyc2lvbj0iMS4xIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHhtbG5zOnhsaW5rPSJodHRwOi8vd3d3LnczLm9yZy8xOTk5L3hsaW5rIiB3aWR0aD0iMTYiIGhlaWdodD0iMjgiIHZpZXdCb3g9IjAgMCAxNiAyOCI+PGcgaWQ9Imljb21vb24taWdub3JlIj48L2c+PHBhdGggZD0iTTE2IDE3cTAgMC40MDYtMC4yOTcgMC43MDNsLTcgN3EtMC4yOTcgMC4yOTctMC43MDMgMC4yOTd0LTAuNzAzLTAuMjk3bC03LTdxLTAuMjk3LTAuMjk3LTAuMjk3LTAuNzAzdDAuMjk3LTAuNzAzIDAuNzAzLTAuMjk3aDE0cTAuNDA2IDAgMC43MDMgMC4yOTd0MC4yOTcgMC43MDN6TTE2IDExcTAgMC40MDYtMC4yOTcgMC43MDN0LTAuNzAzIDAuMjk3aC0xNHEtMC40MDYgMC0wLjcwMy0wLjI5N3QtMC4yOTctMC43MDMgMC4yOTctMC43MDNsNy03cTAuMjk3LTAuMjk3IDAuNzAzLTAuMjk3dDAuNzAzIDAuMjk3bDcgN3EwLjI5NyAwLjI5NyAwLjI5NyAwLjcwM3oiIGZpbGw9IiMwMDAwMDAiPjwvcGF0aD48L3N2Zz4=);
+    background-size: contain;
+    background-position: 30% 50%;
+    background-repeat: no-repeat;
+}
+
+::deep .sort-asc ,
+::deep .sort-desc
+{
+    background: none;
+    opacity: 0.6;
+    margin-top: -0.6rem;
+}
+
+::deep .collapsed:after {
+    content: '▼';
+    display: inline-block;
+    transform: rotate(-90deg);
+}
+
+::deep .expanded:after {
+    display: inline-block;
+    content: '▼';
+    animation-name: expandaanimation;
+    animation-duration: 0.1s;
+    animation-timing-function: ease-in;
+}
+
+@keyframes expandaanimation {
+    from {
+        transform: rotate(-90deg);
+    }
+
+    to {
+        transform: rotate(0deg);
+    }
+}

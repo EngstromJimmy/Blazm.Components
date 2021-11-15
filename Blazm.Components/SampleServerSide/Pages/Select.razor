@@ -1,0 +1,36 @@
+﻿@page "/select"
+
+@using Blazm.Components
+@using BlazmWebAssemblyDemo.Data
+@inject WeatherForecastService ForecastService
+
+<h1>Select demo</h1>
+
+<p>TThis is a demo of the select feature</p>
+
+<BlazmGrid ShowCheckbox="true" SelectedDataChanged="@((List<WeatherForecast>list)=>OnSelectChanged(list))" Data="forecasts" PageSize="10" Sortable="true" SortField="@nameof(WeatherForecast.Date)" ShowFooter="true">
+    <GridColumns>
+        <GridColumn Field="@nameof(WeatherForecast.Date)" Format="{0:d}" Priority="3" />
+        <GridColumn Field="@nameof(WeatherForecast.TemperatureC)" HighlightSign="true" Priority="1" Class="alignRight"/> 
+        <GridColumn Field="@nameof(WeatherForecast.TemperatureF)" Priority="2" Class="alignRight"/>        <GridColumn CanFilter="true" Field="@nameof(WeatherForecast.Summary)" Priority="0" />
+    </GridColumns>
+</BlazmGrid>
+
+Selected items: @numberofselecteditems
+
+
+@code {
+    int numberofselecteditems = 0;
+    private WeatherForecast[] forecasts;
+    private BlazmGrid<WeatherForecast> GroupedGrid;
+    protected override async Task OnInitializedAsync()
+    {
+        forecasts = await ForecastService.GetForecastAsync(DateTime.Now);
+    }
+
+    public Task OnSelectChanged(List<WeatherForecast> list)
+    {
+        numberofselecteditems = list.Count;
+        return Task.CompletedTask;
+    }
+}

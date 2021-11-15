@@ -1,0 +1,54 @@
+﻿@page "/gridduplicatecolumn"
+@using Blazm.Components
+@using BlazmWebAssemblyDemo.Data
+@inject WeatherForecastService ForecastService
+
+<h1>Weather forecast</h1>
+
+<p>This component demonstrates fetching data from a service.</p>
+
+@if (forecasts == null)
+{
+    <p><em>Loading...</em></p>
+}
+else
+{
+    <h2>BlazmGrid - Duplicate Column</h2>
+    <BlazmGrid Data="forecasts" PageSize="10" ShowFooter="true" Sortable="true" SortField="@nameof(WeatherForecast.Date)">
+        <GridColumns>
+            <GridColumn Field="@nameof(WeatherForecast.Date)" Format="{0:t}" Priority="3" Title="Time" />
+            <GridColumn Field="@nameof(WeatherForecast.Date)" Format="{0:d}" Priority="3" />
+            <GridColumn Field="@nameof(WeatherForecast.TemperatureC)" HighlightSign="true" Priority="1" Class="alignRight">
+                <FooterTemplate>
+                    @{
+                        var temp = context as List<WeatherForecast>;
+                    }
+                    @temp.Sum(t => t.TemperatureC)
+                </FooterTemplate>
+            </GridColumn>
+            <GridColumn Field="@nameof(WeatherForecast.TemperatureF)" Priority="2" Class="alignRight">
+                <FooterTemplate>
+                    @{
+                        var temp = context as List<WeatherForecast>;
+                    }
+                    @temp.Sum(t => t.TemperatureF)
+                </FooterTemplate>
+            </GridColumn>
+            <GridColumn Field="@nameof(WeatherForecast.Summary)" Priority="0" />
+        </GridColumns>
+    </BlazmGrid>
+}
+
+@code {
+    private WeatherForecast[] forecasts;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await Load();
+    }
+
+    protected async Task Load(DateTime? date = null)
+    {
+        forecasts = await ForecastService.GetForecastAsync(date ?? DateTime.Now);
+    }
+}

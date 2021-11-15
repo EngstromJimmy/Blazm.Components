@@ -1,0 +1,81 @@
+﻿@page "/emptyornulltemplate"
+@using Blazm.Components
+@using BlazmWebAssemblyDemo.Data
+@inject WeatherForecastService ForecastService
+
+<style>
+    th {
+        white-space: nowrap;
+    }
+</style>
+
+<h1>Null/empty template demo</h1>
+
+<p>By supplying a template we can show information if we don't have any rows to show or if we are loading them</p>
+
+    <BlazmGrid Data="forecastsNull" PageSize="10" Sortable="true" SortField="@nameof(WeatherForecast.Date)" ShowFooter="true">
+        <NullGridTemplate>
+            Loading...
+        </NullGridTemplate>
+        <GridColumns>
+            <GridColumn Field="@nameof(WeatherForecast.Date)" Format="{0:d}" Priority="3" />
+            <GridColumn Field="@nameof(WeatherForecast.TemperatureC)" HighlightSign="true" Priority="1" Class="alignRight"/>
+            <GridColumn Field="@nameof(WeatherForecast.TemperatureF)" Priority="2" Class="alignRight"/>
+            <GridColumn Field="@nameof(WeatherForecast.Summary)" Priority="0" />
+        </GridColumns>
+    </BlazmGrid>
+
+    <h2>BlazmGrid grouped</h2>
+    <BlazmGrid GroupBy="d=>d.Summary" Data="forecastsNull" PageSize="10" Sortable="true" SortField="@nameof(WeatherForecast.Date)" ShowFooter="true" ShowGroupFooter="true">
+        <NullGridTemplate>
+            Loading...
+        </NullGridTemplate>
+        <GroupHeader>
+            <h5>@context</h5>
+        </GroupHeader>
+        <GridColumns>
+            <GridColumn Field="@nameof(WeatherForecast.Date)" Format="{0:d}" Priority="3" />
+            <GridColumn Field="@nameof(WeatherForecast.TemperatureC)" HighlightSign="true" Priority="1" Class="alignRight"/>            <GridColumn Field="@nameof(WeatherForecast.TemperatureF)" Priority="2" Class="alignRight"/>
+            <GridColumn Field="@nameof(WeatherForecast.Summary)" Priority="0" />
+        </GridColumns>
+    </BlazmGrid>
+
+    <h2>Empty template</h2>
+
+    <BlazmGrid Data="forecastsEmpty" SortField="@nameof(WeatherForecast.Date)">
+        <EmptyGridTemplate>
+            No rows to show...
+        </EmptyGridTemplate>
+        <GridColumns>
+            <GridColumn Field="@nameof(WeatherForecast.Date)" Format="{0:d}" Priority="3" />
+            <GridColumn Field="@nameof(WeatherForecast.TemperatureC)" HighlightSign="true" Priority="1" Class="alignRight"/>
+            <GridColumn Field="@nameof(WeatherForecast.TemperatureF)" Priority="2" Class="alignRight"/>
+            <GridColumn Field="@nameof(WeatherForecast.Summary)" Priority="0" />
+        </GridColumns>
+    </BlazmGrid>
+
+    <h2>BlazmGrid grouped</h2>
+    <BlazmGrid GroupBy="d=>d.Summary" Data="forecastsEmpty" UseVirtualize="false" PageSize="10" Sortable="true" SortField="@nameof(WeatherForecast.Date)" ShowFooter="true" ShowGroupFooter="true">
+      <EmptyGridTemplate>
+            No rows to show...
+        </EmptyGridTemplate>
+        <GroupHeader>
+            <h5>@context</h5>
+        </GroupHeader>
+        <GridColumns>
+            <GridColumn Field="@nameof(WeatherForecast.Date)" Format="{0:d}" Priority="3" />
+            <GridColumn Field="@nameof(WeatherForecast.TemperatureC)" HighlightSign="true" Priority="1" Class="alignRight"/>            <GridColumn Field="@nameof(WeatherForecast.TemperatureF)" Priority="2" Class="alignRight"/>
+            <GridColumn Field="@nameof(WeatherForecast.Summary)" Priority="0" />
+        </GridColumns>
+    </BlazmGrid>
+
+@code {
+    private WeatherForecast[] forecastsNull;
+    private WeatherForecast[] forecastsEmpty;
+
+    protected override void OnInitialized()
+    {
+        forecastsNull = null;
+        forecastsEmpty = new WeatherForecast[0];
+    }
+}

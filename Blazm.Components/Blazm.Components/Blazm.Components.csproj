@@ -25,12 +25,11 @@
     <_ContentIncludedByDefault Remove="compilerconfig.json" />
   </ItemGroup>
 
-
   <ItemGroup>
-    <PackageReference Include="BlazorPro.BlazorSize" Version="2.3.0" />
-    <PackageReference Include="Microsoft.AspNetCore.Components" Version="5.0.0" />
-    <PackageReference Include="Microsoft.AspNetCore.Components.Web" Version="5.0.0" />
-    <PackageReference Include="NPOI" Version="2.5.1" />
+    <PackageReference Include="BlazorPro.BlazorSize" Version="6.0.0" />
+    <PackageReference Include="Microsoft.AspNetCore.Components" Version="6.0.0" />
+    <PackageReference Include="Microsoft.AspNetCore.Components.Web" Version="6.0.0" />
+    <PackageReference Include="NPOI" Version="2.5.5" />
     <PackageReference Include="UniversalTypeConverter" Version="2.0.0" />
   </ItemGroup>
 
@@ -43,11 +42,6 @@
     <Content Update="wwwroot\Scripts\ResizeTable.js">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-  </ItemGroup>
-
-
-  <ItemGroup>
-    <Folder Include="wwwroot\css\" />
   </ItemGroup>
 
 </Project>

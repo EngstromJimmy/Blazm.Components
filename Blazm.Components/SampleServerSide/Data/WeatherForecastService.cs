@@ -16,7 +16,7 @@ namespace SampleServerSide.Data
             "Central City", "Duckburg", "Gotham City", "Metropolis", "Star City", "Wakanda", "Åkersberga"
         };
 
-        public Task<WeatherForecast[]> GetForecastAsync(DateTime startDate,int numerofitems=50)
+        public Task<WeatherForecast[]> GetForecastAsync(DateTime startDate, int numerofitems = 50)
         {
             var rng = new Random();
             return Task.FromResult(Enumerable.Range(1, numerofitems).Select(index => new WeatherForecast
@@ -27,5 +27,28 @@ namespace SampleServerSide.Data
                 Location = Locations[rng.Next(Locations.Length)]
             }).ToArray());
         }
+
+        WeatherForecast[]? data = null;
+        int totalcount = 10000;
+        public async Task<WeatherForecast[]> GetForecastAsync(int startIndex, int numberofItems)
+        {
+            if (data == null)
+            {
+                data = await GetForecastAsync(DateTime.Now, totalcount);
+            }
+
+            return data.Skip(startIndex).Take(numberofItems).ToArray();
+        }
+        public async Task<int> GetForecastCountAsync()
+        {
+            if (data == null)
+            {
+                data = await GetForecastAsync(DateTime.Now, totalcount);
+            }
+
+            return data.Count();
+        }
+
+
     }
 }

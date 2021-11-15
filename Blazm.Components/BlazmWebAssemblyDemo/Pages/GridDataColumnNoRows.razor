@@ -1,13 +1,7 @@
-﻿@page "/griddatacolumn"
+﻿@page "/griddatacolumnnorows"
 @using Blazm.Components
-@using SampleServerSide.Data
+@using BlazmWebAssemblyDemo.Data
 @inject WeatherForecastService ForecastService
-
-<style>
-    th {
-        white-space: nowrap;
-    }
-</style>
 
 <h1>Weather forecast</h1>
 
@@ -22,15 +16,15 @@ else
     <h2>BlazmGrid - Data Column</h2>
     <button class="btn btn-success" @onclick="@(async ()=> { await MyGrid.ExportDataAsync("Weather.xlsx","Export","yyyy-mm-dd"); })">Export data to Excel</button>
     <BlazmGrid @ref="MyGrid" Data="forecasts" PageSize="10" Sortable="true" SortField="@nameof(WeatherForecast.Date)" ShowFooter="true">
-        <DetailTemplate>
-            Details! @context.Summary
-        </DetailTemplate>
+        <EmptyGridTemplate>
+            No data found
+        </EmptyGridTemplate>
         <GridColumns>
             <GridColumn Field="@nameof(WeatherForecast.Date)" Format="{0:d}" Priority="3" />
             <GridColumn Field="@nameof(WeatherForecast.TemperatureC)" HighlightSign="true" Priority="1" Class="alignRight">
                 <FooterTemplate>
                     @{
-                            var temp = context as List<WeatherForecast>;
+                        var temp = context as List<WeatherForecast>;
                     }
                     @temp.Sum(t => t.TemperatureC)
                 </FooterTemplate>
@@ -38,17 +32,17 @@ else
             <GridColumn Field="@nameof(WeatherForecast.TemperatureF)" Priority="2" Class="alignRight">
                 <FooterTemplate>
                     @{
-                            var temp = context as List<WeatherForecast>;
+                        var temp = context as List<WeatherForecast>;
                     }
                     @temp.Sum(t => t.TemperatureF)
                 </FooterTemplate>
             </GridColumn>
             <GridColumn Field="@nameof(WeatherForecast.Summary)" Priority="0" />
-            <GridColumn Field="@nameof(WeatherForecast.NullValue)" />
+            <GridColumn Field="@nameof(WeatherForecast.NullValue)"/>
             <GridColumn Exportable="false">
                 <Template>
                     @{
-                            var item = context as WeatherForecast;
+                        var item = context as WeatherForecast;
                     }
                     <button class="btn btn-danger" @onclick="@(() => { Delete(item); })"><i class="far fa-trash-alt"></i></button>
                 </Template>
@@ -62,9 +56,9 @@ else
     private List<WeatherForecast> forecasts;
     private BlazmGrid<WeatherForecast> MyGrid;
 
-    protected override async Task OnInitializedAsync()
+    protected override void OnInitialized()
     {
-        await Load();
+        Load();
     }
 
     protected void Delete(WeatherForecast item)
@@ -72,8 +66,8 @@ else
         forecasts.Remove(item);
     }
 
-    protected async Task Load(DateTime? date = null)
+    protected void Load(DateTime? date = null)
     {
-        forecasts = (await ForecastService.GetForecastAsync(date ?? DateTime.Now)).ToList();
+        forecasts = new List<WeatherForecast>() ;
     }
 }

@@ -2,7 +2,7 @@
 @implements IGridColumn
 
 <th class="@Class @HeaderClass">
-    <span @onclick="@SortColumn" class="@(CanSort ? "cursor-pointer" : "")">
+    <span @onclick="@SortColumn" class="@((ContainerGrid.Sortable && CanSort) ? "cursor-pointer" : "")">
         @if (TitleTemplate != null)
         {
             @TitleTemplate
@@ -14,13 +14,13 @@
     </span>
     @if (CanSort)
     {
-        <span class="fa @(GetSortStyle(this.Field)) @(CanSort ? "cursor-pointer" : "")" @onclick="@SortColumn"></span>
+        <span class="@(GetSortStyle(this.Field)) @(CanSort ? "cursor-pointer" : "")" @onclick="@SortColumn"></span>
     }
 
-    @if (CanFilter)
+   @* @if (CanFilter)
     {
         <span class="fa @(GetFilterStyle(this.Field)) @(CanFilter ? "cursor-pointer" : "")" @onclick="@(async () => { ContainerGrid.ShowFilter = !ContainerGrid.ShowFilter; await ContainerGrid.ApplyFilter(); })"></span>
-    }
+    }*@
 </th>
 
 @code {
@@ -224,15 +224,22 @@
     {
         if (this.ContainerGrid.SortField != columnName)
         {
-            return string.Empty;
+            if (this.ContainerGrid.Sortable)
+            {
+                return "sort-indicator";
+            }
+            else
+            {
+                return string.Empty;
+            }
         }
         if (this.ContainerGrid.SortDirection == System.ComponentModel.ListSortDirection.Ascending)
         {
-            return "fa-sort-up";
+            return "sort-indicator sort-asc";
         }
         else
         {
-            return "fa-sort-down";
+            return "sort-indicator sort-desc";
         }
     }
 
@@ -240,7 +247,7 @@
     {
         if (CanFilter)
         {
-            return "fa-filter";
+            return "filter";
         }
 
         return string.Empty;

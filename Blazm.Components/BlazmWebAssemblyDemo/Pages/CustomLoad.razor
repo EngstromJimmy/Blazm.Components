@@ -1,0 +1,58 @@
+﻿@page "/customload"
+
+@using Blazm.Components
+@using BlazmWebAssemblyDemo.Data
+@inject WeatherForecastService ForecastService
+
+<h1>Custom data load</h1>
+
+<p>The BlazmGrid uses the Virtualize component, we can supply a custom ItemsProvider to take full advantage of the virtualize feature</p>
+<p>This sample has 10.000 rows</p>
+
+
+<BlazmGrid ItemsProvider="LoadData" Sortable="true" SortField="@nameof(WeatherForecast.Date)" >
+    <GridColumns>
+        <GridColumn CanFilter="true" Field="@nameof(WeatherForecast.Date)" Format="{0:d}" Priority="3" />
+        <GridColumn CanFilter="true" Field="@nameof(WeatherForecast.TemperatureC)" HighlightSign="true" Priority="1" Class="alignRight">
+            <FooterTemplate>
+                @{
+                    var temp = context as List<WeatherForecast>;
+                }
+                @temp.Sum(t => t.TemperatureC)
+            </FooterTemplate>
+        </GridColumn>
+        <GridColumn Field="@nameof(WeatherForecast.TemperatureF)" Priority="2" Class="alignRight">
+            <FooterTemplate>
+                @{
+                    var temp = context as List<WeatherForecast>;
+                }
+                @temp.Sum(t => t.TemperatureF)
+            </FooterTemplate>
+        </GridColumn>
+        <GridColumn CanFilter="true" Field="@nameof(WeatherForecast.Summary)" Priority="0" />
+    </GridColumns>
+</BlazmGrid>
+
+
+@code {
+    int? TotalNumberOfRows = null;
+    private async ValueTask<ItemsProviderResult<WeatherForecast>> LoadData(ItemsProviderRequest request)
+    {
+        //Some databases like MS SQL we need to get how many item in total in a separate query
+        if (TotalNumberOfRows==null)
+        {
+            TotalNumberOfRows = await ForecastService.GetForecastCountAsync();
+        }
+
+        if (TotalNumberOfRows != null)
+        {
+            var numberofItems = Math.Min(request.Count, TotalNumberOfRows.Value - request.StartIndex);
+            var data = await ForecastService.GetForecastAsync(request.StartIndex, request.Count);
+            return new ItemsProviderResult<WeatherForecast>(data, TotalNumberOfRows.Value);
+        }
+        else
+        {
+            throw new Exception("No data");
+        }
+    }
+}

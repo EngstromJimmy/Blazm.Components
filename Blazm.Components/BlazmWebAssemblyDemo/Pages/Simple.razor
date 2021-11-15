@@ -1,22 +1,14 @@
-﻿@page "/fetchdataselect"
+﻿@page "/simple"
 
 @using Blazm.Components
-@using SampleServerSide.Data
+@using BlazmWebAssemblyDemo.Data
 @inject WeatherForecastService ForecastService
 
-<style>
-    th,td {
-        white-space: nowrap;
-    }
-</style>
+<h1>Simple demo</h1>
 
-<h1>Weather forecast</h1>
+<p>This is a simple grid demo with paging</p>
 
-<p>This component demonstrates fetching data from a service.</p>
-
-
-<h2>BlazmGrid</h2>
-<BlazmGrid Data="forecasts" PageSize="10" Sortable="true" SortField="@nameof(WeatherForecast.Date)" ShowFooter="true" ShowCheckbox="true" SelectedDataChanged="@((List<WeatherForecast>list)=>OnSelectChanged(list))">
+<BlazmGrid Data="forecasts" PageSize="10" Sortable="true" SortField="@nameof(WeatherForecast.Date)" ShowFooter="true">
     <GridColumns>
         <GridColumn CanFilter="true" Field="@nameof(WeatherForecast.Date)" Format="{0:d}" Priority="3" />
         <GridColumn CanFilter="true" Field="@nameof(WeatherForecast.TemperatureC)" HighlightSign="true" Priority="1" Class="alignRight">
@@ -39,21 +31,11 @@
     </GridColumns>
 </BlazmGrid>
 
-Selected items: @numberofselecteditems
 
-
-@code {
-    int numberofselecteditems = 0;
+@code { 
     private WeatherForecast[] forecasts;
-    private BlazmGrid<WeatherForecast> GroupedGrid;
     protected override async Task OnInitializedAsync()
     {
         forecasts = await ForecastService.GetForecastAsync(DateTime.Now);
-    }
-
-    public Task OnSelectChanged(List<WeatherForecast> list)
-    {
-        numberofselecteditems = list.Count;
-        return Task.CompletedTask;
     }
 }

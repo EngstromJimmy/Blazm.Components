@@ -4,7 +4,7 @@ using System;
 
 namespace Blazm.Components
 {
-    public static class GridServiceCollectionExtensions
+    public static class BlazmServiceCollectionExtensions
     {
         [Obsolete("Use AddBlazm instead")]
         public static IServiceCollection AddGrid(this IServiceCollection services)
@@ -14,6 +14,7 @@ namespace Blazm.Components
 
         public static IServiceCollection AddBlazm(this IServiceCollection services)
         {
+            services.AddScoped<ResizeListener>();
             services.AddResizeListener(options =>
             {
                 options.ReportRate = 300;

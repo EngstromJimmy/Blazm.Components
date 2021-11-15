@@ -148,20 +148,20 @@
                 </tfoot>
             }
         </table>
-        @if (PageSize != 0 && TotalNumberOfRows > PageSize && GroupBy == null)
+        @if (PageSize != 0 && (((Data?.Count())??0) > PageSize) && GroupBy == null)
         {
             <ul class="pagination">
                 <li class="page-item @(CurrentPage==0?"disabled":"cursor-pointer")"><a class="page-link" @onclick="PreviousPage">@PreviousText</a></li>
                 @if (ShowPageCounter)
                 {
-                    var totalPageCount = TotalNumberOfRows / PageSize;
-                    if (TotalNumberOfRows % PageSize != 0)
+                    var totalPageCount = Data.Count() / PageSize;
+                    if (Data.Count() % PageSize != 0)
                     {
                         totalPageCount++;
                     }
                     <li class="page-item page-count">@(CurrentPage + 1) / @totalPageCount</li>
                 }
-                <li class="page-item  @((((CurrentPage * PageSize)+PageSize) < TotalNumberOfRows)?"cursor-pointer":"disabled")"><a class="page-link" @onclick="NextPage">@NextText</a></li>
+                <li class="page-item  @((((CurrentPage * PageSize)+PageSize) < Data.Count())?"cursor-pointer":"disabled")"><a class="page-link" @onclick="NextPage">@NextText</a></li>
             </ul>
 
         }
@@ -174,7 +174,7 @@
         {
             get;
             set;
-        } =@<i class="fas fa-greater-than"></i>;
+        } =@<i class="collapsed"></i>;
 
 
 [Parameter]
@@ -182,6 +182,6 @@ public RenderFragment ExpandedTemplate
 {
 get;
 set;
-} = @<i class="fas fa-greater-than fa-rotate-90"></i>;
+} = @<i class="expanded"></i>;
 
     }
