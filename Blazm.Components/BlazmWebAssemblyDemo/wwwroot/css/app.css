@@ -62,3 +62,15 @@ a, .btn-link {
     .blazor-error-boundary::after {
         content: "An error has occurred."
     }
+
+.negative {
+    color: blue !important;
+}
+
+.positive {
+    color: red !important;
+}
+
+.table > :not(:last-child) > :last-child > * {
+    border-bottom-color: black !important;
+}

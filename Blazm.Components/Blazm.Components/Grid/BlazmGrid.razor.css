@@ -35,14 +35,6 @@
     list-style: none;
 }
 
-::deep .negative {
-    color: red;
-}
-
-::deep .positive {
-    color: blue;
-}
-
 ::deep .alignRight {
     text-align: right;
 }
@@ -122,3 +114,7 @@
     }
 }
 
+
+::deep .table > :not(:last-child) > :last-child > * {
+    border-bottom-color: black;
+}

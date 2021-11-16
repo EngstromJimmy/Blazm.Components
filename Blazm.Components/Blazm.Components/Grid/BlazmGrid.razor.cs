@@ -174,6 +174,9 @@ namespace Blazm.Components
         public Func<TItem, object>? GroupBy { get; set; } = null;
 
         [Parameter]
+        public Func<TItem?, string>? RowCss { get; set; } = null;
+
+        [Parameter]
         public ItemsProviderDelegate<TItem>? ItemsProvider { get; set; } = null;
 
         [Parameter]
