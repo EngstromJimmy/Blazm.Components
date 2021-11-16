@@ -74,3 +74,4 @@ a, .btn-link {
 .table > :not(:last-child) > :last-child > * {
     border-bottom-color: black !important;
 }
+
