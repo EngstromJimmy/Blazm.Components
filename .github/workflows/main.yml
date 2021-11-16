@@ -44,6 +44,10 @@ jobs:
       - name: Add .nojekyll file
         run: touch ${{ env.PUBLISH_DIR }}/.nojekyll
         
+        # copy index.html to 404.html to serve the same file when a file is not found this makes deep linking possible
+      - name: copy index.html to 404.html
+        run: cp release/wwwroot/index.html release/wwwroot/404.html
+      
       - name: Commit to GitHub pages Repo
         if: success()
         uses: crazy-max/ghaction-github-pages@v1.5.1
