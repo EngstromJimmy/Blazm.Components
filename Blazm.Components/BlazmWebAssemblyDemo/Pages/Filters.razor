@@ -8,7 +8,9 @@
 
 <p>By enabling filter you will get filters with the correct input box</p>
 
-<BlazmGrid Data="forecasts" ShowFilter="true">
+<button @onclick="@(async ()=> { Grid.ClearFilters(); })">Clear filters</button>
+
+<BlazmGrid Data="forecasts" ShowFilter="true" @ref="Grid">
     <GridColumns>
         <GridColumn CanFilter="true" Field="@nameof(WeatherForecast.Date)" Format="{0:d}" Priority="3" />
         <GridColumn CanFilter="true" Field="@nameof(WeatherForecast.TemperatureC)" HighlightSign="true" Priority="1" Class="alignRight"/>
@@ -18,6 +20,7 @@
 
 
 @code { 
+    private BlazmGrid<WeatherForecast> Grid;
     private WeatherForecast[] forecasts;
     protected override async Task OnInitializedAsync()
     {

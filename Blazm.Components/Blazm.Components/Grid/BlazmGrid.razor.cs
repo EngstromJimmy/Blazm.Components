@@ -195,6 +195,18 @@ namespace Blazm.Components
 
         #endregion
 
+        public async Task ClearFilters()
+        { 
+            foreach(var c in Columns)
+            {
+                foreach(var f in c.Filters)
+                {
+                    f.FilterValue = null;
+                }
+            }
+            await ApplyFilter();
+        }
+
         [Inject] ResizeListener listener { get; set; } = default!;
         [Inject] IJSRuntime jsruntime { get; set; } = default!;
 
