@@ -46,7 +46,7 @@ jobs:
         
         # copy index.html to 404.html to serve the same file when a file is not found this makes deep linking possible
       - name: copy index.html to 404.html
-        run: cp release/wwwroot/index.html release/wwwroot/404.html
+        run: cp ${{ env.PUBLISH_DIR }}/index.html ${{ env.PUBLISH_DIR }}/404.html
       
       - name: Commit to GitHub pages Repo
         if: success()
