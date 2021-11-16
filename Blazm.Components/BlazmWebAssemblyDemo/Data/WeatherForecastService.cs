@@ -13,7 +13,7 @@ public class WeatherForecastService
 
     private static readonly string[] Locations = new[]
     {
-        "Central City", "Duckburg", "Gotham City", "Metropolis", "Star City", "Wakanda", "�kersberga"
+        "Central City", "Duckburg", "Gotham City", "Metropolis", "Star City", "Wakanda", "Åkersberga","Gudö"
     };
 
     public Task<WeatherForecast[]> GetForecastAsync(DateTime startDate, int numerofitems = 50)
