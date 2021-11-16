@@ -1,0 +1,31 @@
+﻿@page "/filtercommands"
+
+@using Blazm.Components
+@using BlazmWebAssemblyDemo.Data
+@inject WeatherForecastService ForecastService
+
+<h1>Filter demo</h1>
+
+<p>By enabling filter you will get filters with the correct input box</p>
+
+<BlazmGrid Data="forecasts" ShowFilter="true">
+    <GridColumns>
+        <GridColumn Id="CommandColumn">
+            <Template>
+                <button>Test</button>
+            </Template>
+        </GridColumn>
+        <GridColumn CanFilter="true" Field="@nameof(WeatherForecast.Date)" Format="{0:d}" Priority="3" />
+        <GridColumn CanFilter="true" Field="@nameof(WeatherForecast.TemperatureC)" HighlightSign="true" Priority="1" Class="alignRight"/>
+        <GridColumn CanFilter="true" Field="@nameof(WeatherForecast.Summary)" Priority="0" />
+    </GridColumns>
+</BlazmGrid>
+
+
+@code { 
+    private WeatherForecast[] forecasts;
+    protected override async Task OnInitializedAsync()
+    {
+        forecasts = await ForecastService.GetForecastAsync(DateTime.Now);
+    }
+}

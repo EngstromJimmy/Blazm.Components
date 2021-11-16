@@ -6,15 +6,15 @@
     <LangVersion>latest</LangVersion>
     <Authors>Jimmy Engström</Authors>
     <Description>A collection of Blazor components</Description>
-    <Version>1.0.7</Version>
+    <Version>1.1.0</Version>
 	  <Nullable>enable</Nullable>
     <PackageProjectUrl>https://github.com/EngstromJimmy/Blazm.Components</PackageProjectUrl>
     <RepositoryUrl>https://github.com/EngstromJimmy/Blazm.Components</RepositoryUrl>
     <PackageTags>moved</PackageTags>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
     <PackageLicenseExpression>Apache-2.0</PackageLicenseExpression>
-    <AssemblyVersion>1.0.7.0</AssemblyVersion>
-    <FileVersion>1.0.7.0</FileVersion>
+    <AssemblyVersion>1.1.0.0</AssemblyVersion>
+    <FileVersion>1.1.0.0</FileVersion>
   </PropertyGroup>
 
   <ItemGroup>
@@ -36,12 +36,4 @@
   <ItemGroup>
     <None Include="compilerconfig.json" />
   </ItemGroup>
-
-
-  <ItemGroup>
-    <Content Update="wwwroot\Scripts\ResizeTable.js">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-  </ItemGroup>
-
 </Project>

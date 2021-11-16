@@ -32,64 +32,60 @@
     }
     @foreach (var c in ContainerGrid.Columns.Where(c => c.Visible))
     {
-        if (!string.IsNullOrEmpty(c.Field))
+        @if (c.CanFilter && !string.IsNullOrEmpty(c.Field))
         {
+            <td class="@c.Class @c.HeaderClass">
+                <ul class="filterlist">
+                    @{ 
+                        filtercounter = 0;
+                        foreach (var f in c.Filters)
+                        {
+                            <li class="filteritem">
+                                @{ 
+                                    filtercounter++;
+                                    var type = c.Type.GetProperty(c.Field).PropertyType;
 
-            @if (c.CanFilter)
-            {
-                <td class="@c.Class @c.HeaderClass">
-                    <ul class="filterlist">
-                        @{ 
-                            filtercounter = 0;
-                            foreach (var f in c.Filters)
-                            {
-                                <li class="filteritem">
-                                    @{ 
-                                        filtercounter++;
-                                        var type = c.Type.GetProperty(c.Field).PropertyType;
-
+                                if(c.ShowAdvancedFilter)
+                                {
+                                <i class="fas fa-less-than-equal cursor-pointer @(f.FilterType == FilterType.LessThanOrEqual ? "selectedfiltertype" : "filtertype")" @onclick="() => SetFilter(c, f, FilterType.LessThanOrEqual)"></i>
+                                <i class="fas fa-greater-than-equal cursor-pointer @(f.FilterType == FilterType.GreaterThanOrEqual ? "selectedfiltertype" : "filtertype")" @onclick="() => SetFilter(c, f, FilterType.GreaterThanOrEqual)"></i>
+                                <i class="fas fa-equals cursor-pointer @(f.FilterType == FilterType.Equal ? "selectedfiltertype" : "filtertype")" @onclick="() => SetFilter(c, f, FilterType.Equal)"></i>
+                                }
+                                    if (type == typeof(string))
+                                    {
+                                <input type="Text" @bind="f.FilterValue" @bind:event="oninput" @onkeyup="c.ApplyFilter" />
+                                    }
+                                    else if (type == typeof(DateTime))
+                                    {
+                                <input type="Date" @bind="f.FilterValue" @bind:event="oninput" @onkeyup="c.ApplyFilter" @onchange="c.ApplyFilter" />
+                                    }
+                                    else
+                                    {
+                                <input type="number" @bind="f.FilterValue" @bind:event="oninput" @onkeyup="c.ApplyFilter" />
+                                    }
                                     if(c.ShowAdvancedFilter)
                                     {
-                                    <i class="fas fa-less-than-equal cursor-pointer @(f.FilterType == FilterType.LessThanOrEqual ? "selectedfiltertype" : "filtertype")" @onclick="() => SetFilter(c, f, FilterType.LessThanOrEqual)"></i>
-                                    <i class="fas fa-greater-than-equal cursor-pointer @(f.FilterType == FilterType.GreaterThanOrEqual ? "selectedfiltertype" : "filtertype")" @onclick="() => SetFilter(c, f, FilterType.GreaterThanOrEqual)"></i>
-                                    <i class="fas fa-equals cursor-pointer @(f.FilterType == FilterType.Equal ? "selectedfiltertype" : "filtertype")" @onclick="() => SetFilter(c, f, FilterType.Equal)"></i>
-                                    }
-                                        if (type == typeof(string))
+                                        if (filtercounter == 1)
                                         {
-                                    <input type="Text" @bind="f.FilterValue" @bind:event="oninput" @onkeyup="c.ApplyFilter" />
-                                        }
-                                        else if (type == typeof(DateTime))
-                                        {
-                                    <input type="Date" @bind="f.FilterValue" @bind:event="oninput" @onkeyup="c.ApplyFilter" @onchange="c.ApplyFilter" />
+                                            <i class="fas fa-times-circle cursor-pointer" @onclick="@(() => { f.FilterValue = ""; c.ApplyFilter(); })"></i>
+                                            <i class="fas fa-plus-circle cursor-pointer" @onclick="@(() => { c.Filters.Add(new Filter()); })"></i>
                                         }
                                         else
                                         {
-                                    <input type="number" @bind="f.FilterValue" @bind:event="oninput" @onkeyup="c.ApplyFilter" />
-                                        }
-                                        if(c.ShowAdvancedFilter)
-                                        {
-                                            if (filtercounter == 1)
-                                            {
-                                                <i class="fas fa-times-circle cursor-pointer" @onclick="@(() => { f.FilterValue = ""; c.ApplyFilter(); })"></i>
-                                                <i class="fas fa-plus-circle cursor-pointer" @onclick="@(() => { c.Filters.Add(new Filter()); })"></i>
-                                            }
-                                            else
-                                            {
-                                                <i class="fas fa-minus-circle cursor-pointer" @onclick="@(() => { c.Filters.Remove(f); c.ApplyFilter(); })"></i>
-                                            }
+                                            <i class="fas fa-minus-circle cursor-pointer" @onclick="@(() => { c.Filters.Remove(f); c.ApplyFilter(); })"></i>
                                         }
                                     }
-                                </li>
                                 }
-                        
+                            </li>
                             }
-                    </ul>
-                </td>
-            }
-            else
-            {
-                <td></td>
-            }
+                        
+                        }
+                </ul>
+            </td>
+        }
+        else
+        {
+            <td></td>
         }
     }
 </tr>
