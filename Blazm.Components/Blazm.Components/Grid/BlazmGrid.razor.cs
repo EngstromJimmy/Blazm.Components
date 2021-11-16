@@ -463,14 +463,20 @@ namespace Blazm.Components
                     }
                     else
                     {
-                        var d = Convert.ToDouble(value);
-                        if (d == 0d)
+                        if (double.TryParse(value, out var dvalue))
                         {
-                            return "";
+                            if (dvalue == 0d)
+                            {
+                                return "";
+                            }
+                            else
+                            {
+                                return column.ValuePositiveClass;
+                            }
                         }
                         else
                         {
-                            return column.ValuePositiveClass;
+                            return "";
                         }
                     }
                 }
