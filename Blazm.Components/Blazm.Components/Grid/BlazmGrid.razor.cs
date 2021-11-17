@@ -230,6 +230,7 @@ namespace Blazm.Components
             if(Data!=null && Data.Count()>0)
             {
                 HasData = true;
+                await RefreshDataAsync();
             }
             
 
