@@ -10,11 +10,12 @@
 
 <button @onclick="@(async ()=> { Grid.ClearFilters(); })">Clear filters</button>
 
-<BlazmGrid Data="forecasts" ShowFilter="true" @ref="Grid">
+<BlazmGrid Data="forecasts" PageSize="10" ShowFilter="true" @ref="Grid">
     <GridColumns>
         <GridColumn CanFilter="true" Field="@nameof(WeatherForecast.Date)" Format="{0:d}" Priority="3" />
         <GridColumn CanFilter="true" Field="@nameof(WeatherForecast.TemperatureC)" HighlightSign="true" Priority="1" Class="alignRight"/>
         <GridColumn CanFilter="true" Field="@nameof(WeatherForecast.Summary)" Priority="0" />
+        <GridColumn CanFilter="true" Field="@nameof(WeatherForecast.NullValue)" Priority="0" />
     </GridColumns>
 </BlazmGrid>
 
@@ -25,5 +26,8 @@
     protected override async Task OnInitializedAsync()
     {
         forecasts = await ForecastService.GetForecastAsync(DateTime.Now);
+
+
     }
 }
+

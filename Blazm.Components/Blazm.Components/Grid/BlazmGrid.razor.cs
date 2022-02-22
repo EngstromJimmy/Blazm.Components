@@ -192,7 +192,7 @@ namespace Blazm.Components
             set;
         } = null;
 
-
+        public bool IsFiltered { get { return Columns.Any(c => c.Filters.Any(f => !string.IsNullOrEmpty(f.FilterValue))); } }
         #endregion
 
         public async Task ClearFilters()
@@ -280,7 +280,7 @@ namespace Blazm.Components
                     }
                 }
 
-                if (PageSize != 0)
+                if (PageSize != 0 && !IsFiltered)
                 {
                     pagedData = pagedData.Skip(PageSize * CurrentPage).Take(PageSize).ToList();
                 }
@@ -321,7 +321,7 @@ namespace Blazm.Components
                             filtervalue = null;
                         }
 
-                        if (filtervalue != null)
+                        if (!string.IsNullOrEmpty(filtervalue?.ToString()))
                         {
                             var filter = GetExpression<TItem>(column.Field, filtervalue, f.FilterType);
                             try
@@ -716,19 +716,24 @@ namespace Blazm.Components
             public int ContainerClientWidth { get; set; }
         }
 
+        
         static Expression<Func<T, bool>> GetExpression<T>(string propertyName, object filterValue,FilterType filterType)
         {
             var parameterExp = Expression.Parameter(typeof(T));
             var propertyExp = Expression.Property(parameterExp, propertyName);
             var someValue = Expression.Constant(filterValue, propertyExp.Type);
-
+            
 
             if ((filterType == FilterType.Equal && propertyExp.Type == typeof(string)) || propertyExp.Type == typeof(string))
             {
                 MethodInfo method = typeof(Extensions.ObjectExtensions).GetMethod("ContainsExt", BindingFlags.Static | BindingFlags.Public | BindingFlags.NonPublic, null, new[] { propertyExp.Type, typeof(string) }, null);
                 var containsMethodExp = Expression.Call(null, method, propertyExp, someValue);
-
-                return Expression.Lambda<Func<T, bool>>(containsMethodExp, parameterExp);
+                //NullCheck
+                var nullCheck = Expression.NotEqual(propertyExp, Expression.Constant(null, typeof(object)));
+                var containsMethodExpwithnullcheck = Expression.AndAlso(nullCheck, containsMethodExp);
+                
+                return Expression.Lambda<Func<T, bool>>(containsMethodExpwithnullcheck, parameterExp);
+                
             }
             else if ((filterType == FilterType.Equal && propertyExp.Type == typeof(DateTime)))
             {

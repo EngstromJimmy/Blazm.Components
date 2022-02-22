@@ -10,7 +10,14 @@ namespace Blazm.Components.Extensions
     {
         public static bool ContainsExt(object obj, string val)
         {
-            return obj.ToString()?.IndexOf(val.ToString() ?? "", StringComparison.InvariantCultureIgnoreCase) > -1 ? true : false;
+            if (obj != null && val != null)
+            {
+                return obj.ToString()?.IndexOf(val.ToString() ?? "", StringComparison.InvariantCultureIgnoreCase) > -1 ? true : false;
+            }
+            else 
+            { 
+                return false; 
+            }
         }   
     }
 }

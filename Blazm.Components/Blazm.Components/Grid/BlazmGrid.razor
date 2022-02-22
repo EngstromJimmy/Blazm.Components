@@ -148,7 +148,7 @@
                 </tfoot>
             }
         </table>
-        @if (PageSize != 0 && (((Data?.Count())??0) > PageSize) && GroupBy == null)
+        @if (PageSize != 0 && !IsFiltered && (((Data?.Count())??0) > PageSize) && GroupBy == null)
         {
             <ul class="pagination">
                 <li class="page-item @(CurrentPage==0?"disabled":"cursor-pointer")"><a class="page-link" @onclick="PreviousPage">@PreviousText</a></li>
