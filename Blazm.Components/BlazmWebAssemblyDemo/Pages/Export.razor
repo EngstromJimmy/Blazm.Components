@@ -9,7 +9,7 @@
 <p>This demo shows the build in Excel export</p>
 
 <button class="btn btn-success" @onclick="@(async ()=> { await Grid.ExportDataAsync("Weather.xlsx","Export","yyyy-mm-dd"); })">Export data to Excel</button>
-<BlazmGrid @ref="Grid" Data="forecasts">
+<BlazmGrid @ref="Grid" Data="forecasts" Sortable="true">
     <GridColumns>
         <GridColumn CanFilter="true" Field="@nameof(WeatherForecast.Date)" Format="{0:d}" Priority="3" />
         <GridColumn CanFilter="true" Field="@nameof(WeatherForecast.TemperatureC)" HighlightSign="true" Priority="1" Class="alignRight"/> 
