@@ -686,11 +686,20 @@ namespace Blazm.Components
                             for (var i = 0; i < size?.Columns?.Length; i++)
                             {
                                 var counter = i;
-                                if (ShowCheckbox || Columns.Any(c => !c.Visible) || DetailTemplate != null)
+                                if (ShowCheckbox)
                                 {
-                                    //Skip the first one
-                                    counter = i - 1;
-                                    if (i == 0)
+                                    //Don't count checkboxes
+                                    counter = -1;
+                                    if (counter <= 0)
+                                    {
+                                        continue;
+                                    }
+                                }
+                                if (Columns.Any(c => !c.Visible) || DetailTemplate != null)
+                                {
+                                    //Don't count detail arrow
+                                    counter = -1;
+                                    if (counter <= 0)
                                     {
                                         continue;
                                     }

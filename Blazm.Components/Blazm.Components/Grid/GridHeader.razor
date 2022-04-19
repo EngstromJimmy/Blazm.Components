@@ -2,7 +2,12 @@
 @namespace Blazm.Components
 <CascadingValue Value="ContainerGrid">
     <tr>
-        @if (ContainerGrid.ShowCheckbox || ContainerGrid.Columns.Any(c => !c.Visible) || ContainerGrid.DetailTemplate != null)
+        @if (ContainerGrid.Columns.Any(c => !c.Visible) || ContainerGrid.DetailTemplate != null)
+        {
+            <th></th>
+        }
+
+        @if (ContainerGrid.ShowCheckbox)
         {
             <th>
                 @if (ContainerGrid.ShowCheckbox)
@@ -11,6 +16,8 @@
                 }
             </th>
         }
+
+
 
         @ContainerGrid.GridColumns
         @if (ContainerGrid.AutoGenerateColumns && ContainerGrid.Data != null && ContainerGrid.Data.Any())
@@ -25,11 +32,21 @@
     @if (ContainerGrid.Columns.Any(c => c.CanFilter) && ContainerGrid.ShowFilter)
     {
 <tr>
-    @if (ContainerGrid.ShowCheckbox || ContainerGrid.Columns.Any(c => !c.Visible) || ContainerGrid.DetailTemplate != null)
+    @if (ContainerGrid.Columns.Any(c => !c.Visible) || ContainerGrid.DetailTemplate != null)
     {
         <td>
         </td>
     }
+    
+    
+    @if (ContainerGrid.ShowCheckbox)
+    {
+        <td>
+        </td>
+    }
+    
+
+
     @foreach (var c in ContainerGrid.Columns.Where(c => c.Visible))
     {
         @if (c.CanFilter && !string.IsNullOrEmpty(c.Field))
