@@ -33,20 +33,20 @@
                 </thead>
                 <tbody>
                     @*@if (HasData)
-                    {*@
-                        @if (UseVirtualize)
+                {*@
+                    @if (UseVirtualize)
+                    {
+                        <Virtualize @ref="Virtualize" TItem="TItem" Context="row" ItemsProvider="ItemsProvider">
+                            <GridDataRow Row="row" />
+                        </Virtualize>
+                    }
+                    else
+                    {
+                        foreach (var row in loadPagedData())
                         {
-                            <Virtualize @ref="Virtualize" TItem="TItem" Context="row" ItemsProvider="ItemsProvider">
-                                <GridDataRow Row="row" />
-                            </Virtualize>
+                            <GridDataRow Row="row" />
                         }
-                        else
-                        {
-                            foreach (var row in loadPagedData())
-                            {
-                                <GridDataRow Row="row" />
-                            }
-                        }
+                    }
                     @*}*@
                 </tbody>
             }
@@ -95,7 +95,11 @@
                         @if (ShowGroupFooter)
                         {
                             <tr class="footerrow">
-                                @if (ShowCheckbox || Columns.Any(c => !c.Visible || DetailTemplate != null))
+                                @if (ShowCheckbox)
+                                {
+                                    <td></td>
+                                }
+                                @if (Columns.Any(c => !c.Visible) || DetailTemplate != null)
                                 {
                                     <td></td>
                                 }
@@ -103,7 +107,9 @@
                                 {
                                     <td class="@column.Class">
                                         @if (column.GroupFooterTemplate != null)
-                                        {@column.GroupFooterTemplate(d.ToList())}
+                                        {
+                                            @column.GroupFooterTemplate(d.ToList())
+                                        }
                                     </td>
                                 }
                             </tr>
@@ -124,7 +130,7 @@
                         {
                             @EmptyGridTemplate
                         }
-                        
+
                     </td>
                 </tr>
             }
@@ -133,7 +139,11 @@
             {
                 <tfoot>
                     <tr class="footerrow">
-                        @if (ShowCheckbox || Columns.Any(c => !c.Visible) || DetailTemplate != null)
+                        @if (ShowCheckbox)
+                        {
+                            <td></td>
+                        }
+                        @if (Columns.Any(c => !c.Visible) || DetailTemplate != null)
                         {
                             <td></td>
                         }
@@ -141,14 +151,16 @@
                         {
                             <td class="@column.Class">
                                 @if (column.FooterTemplate != null)
-                                {@column.FooterTemplate(Data.ToList())}
+                                {
+                                    @column.FooterTemplate(Data.ToList())
+                                }
                             </td>
                         }
                     </tr>
                 </tfoot>
             }
         </table>
-        @if (PageSize != 0 && !IsFiltered && (((Data?.Count())??0) > PageSize) && GroupBy == null)
+        @if (PageSize != 0 && !IsFiltered && (((Data?.Count()) ?? 0) > PageSize) && GroupBy == null)
         {
             <ul class="pagination">
                 <li class="page-item @(CurrentPage==0?"disabled":"cursor-pointer")"><a class="page-link" @onclick="PreviousPage">@PreviousText</a></li>
@@ -167,21 +179,21 @@
         }
     </div>
 </CascadingValue>
-    @code
-    {
-        [Parameter]
-        public RenderFragment CollapsedTemplate
-        {
-            get;
-            set;
-        } =@<i class="collapsed"></i>;
-
-
-[Parameter]
-public RenderFragment ExpandedTemplate
+@code
 {
-get;
-set;
-} = @<i class="expanded"></i>;
+    [Parameter]
+    public RenderFragment CollapsedTemplate
+    {
+        get;
+        set;
+    } =@<i class="collapsed"></i>;
+
+
+    [Parameter]
+    public RenderFragment ExpandedTemplate
+    {
+        get;
+        set;
+    } = @<i class="expanded"></i>;
 
     }
