@@ -467,7 +467,10 @@ namespace Blazm.Components
         {
             if ((bool)selected)
             {
-                SelectedData.Add(item);
+                if (!SelectedData.Contains(item))
+                {
+                    SelectedData.Add(item);
+                }
             }
             else
             {
