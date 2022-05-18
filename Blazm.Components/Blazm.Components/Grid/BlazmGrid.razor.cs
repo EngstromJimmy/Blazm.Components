@@ -214,9 +214,9 @@ namespace Blazm.Components
                 ItemsProvider = LoadData;
             }
 
-            if (Data != null && Data.Count() > 0)
+            if (Data != null)
             {
-                HasData = true;
+                HasData = Data.Any();
                 await RefreshDataAsync();
             }
 
