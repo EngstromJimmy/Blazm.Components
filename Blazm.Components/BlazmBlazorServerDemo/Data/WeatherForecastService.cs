@@ -1,4 +1,4 @@
-namespace BlazmWebAssemblyDemo.Data;
+namespace BlazmBlazorServerDemo.Data;
 
 public class WeatherForecastService
 {

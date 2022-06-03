@@ -5,15 +5,15 @@
     <LangVersion>latest</LangVersion>
     <Authors>Jimmy Engström</Authors>
     <Description>A collection of Blazor components</Description>
-    <Version>1.1.8</Version>
+    <Version>1.1.9</Version>
 	  <Nullable>enable</Nullable>
     <PackageProjectUrl>https://github.com/EngstromJimmy/Blazm.Components</PackageProjectUrl>
     <RepositoryUrl>https://github.com/EngstromJimmy/Blazm.Components</RepositoryUrl>
     <PackageTags>moved</PackageTags>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
-    <AssemblyVersion>1.1.8.0</AssemblyVersion>
-    <FileVersion>1.1.8.0</FileVersion>
+    <AssemblyVersion>1.1.9.0</AssemblyVersion>
+    <FileVersion>1.1.9.0</FileVersion>
   </PropertyGroup>
 
   <ItemGroup>

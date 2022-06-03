@@ -118,6 +118,12 @@ namespace Blazm.Components
         } = null;
 
         [Parameter]
+        public System.ComponentModel.ListSortDirection GroupSortDirection
+        {
+            get; set;
+        } = System.ComponentModel.ListSortDirection.Ascending;
+
+        [Parameter]
         public System.ComponentModel.ListSortDirection SortDirection
         {
             get; set;

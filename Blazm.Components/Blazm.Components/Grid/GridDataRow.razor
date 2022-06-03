@@ -2,7 +2,7 @@
 @namespace Blazm.Components
 
 <CascadingValue Value="ContainerGrid">
-    <tr class="@(ContainerGrid.Columns.Any(c => !c.Visible) || ContainerGrid.DetailTemplate != null ? "expandable" : "") @(ContainerGrid.RowCss!=null?ContainerGrid.RowCss(Row):"")">
+    <tr @key="Row" class="@(ContainerGrid.Columns.Any(c => !c.Visible) || ContainerGrid.DetailTemplate != null ? "expandable" : "") @(ContainerGrid.RowCss!=null?ContainerGrid.RowCss(Row):"")">
         @if (ContainerGrid.Columns.Any(c => !c.Visible) || ContainerGrid.ShowCheckbox || ContainerGrid.DetailTemplate != null)
         {
             

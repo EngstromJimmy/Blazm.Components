@@ -57,7 +57,16 @@
 
                     if (GroupSortField != null)
                     {
-                        Data = Data.OrderByDescending(x => x.GetType().GetProperty(GroupSortField).GetValue(x, null)).ToList();
+                        if (GroupSortDirection == ListSortDirection.Ascending)
+                        {
+                            Data = Data.OrderBy(x => x.GetType().GetProperty(GroupSortField).GetValue(x, null));
+                        }
+                        else
+                        {
+                            Data = Data.OrderByDescending(x => x.GetType().GetProperty(GroupSortField).GetValue(x, null));
+                        }
+                        
+                        
                     }
 
                     var groupedData = Data.GroupBy(GroupBy);

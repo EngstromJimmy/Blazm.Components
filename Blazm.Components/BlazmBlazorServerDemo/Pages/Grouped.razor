@@ -1,7 +1,8 @@
 ﻿@page "/grouped"
 
 @using Blazm.Components
-@using BlazmWebAssemblyDemo.Data
+@using BlazmBlazorServerDemo.Data
+
 @inject WeatherForecastService ForecastService
 
 <h1>Grouped demo</h1>
@@ -11,8 +12,8 @@
 
 <h2>BlazmGrid grouped</h2>
 
-<BlazmGrid  GroupBy="d=>d.Summary" Data="forecasts" Sortable="true" SortField="@nameof(WeatherForecast.Date)" ShowFooter="true" ShowGroupFooter="true">
-    <GroupHeader> 
+<BlazmGrid GroupBy="d=>d.Summary" Data="forecasts" Sortable="true" SortField="@nameof(WeatherForecast.Location)" ShowFooter="true" ShowGroupFooter="true" GroupSortField="@nameof(WeatherForecast.Summary)">
+    <GroupHeader>
         <h5>@context</h5>
     </GroupHeader>
     <GridColumns>

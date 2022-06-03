@@ -1,7 +1,7 @@
 ﻿@namespace Blazm.Components
 @implements IGridColumn
 
-<th class="@Class @HeaderClass">
+<th class="@Class @HeaderClass" >
     <span @onclick="@SortColumn" class="@((ContainerGrid.Sortable && CanSort) ? "cursor-pointer" : "")">
         @if (TitleTemplate != null)
         {
@@ -113,6 +113,7 @@
         get;
         set;
     }
+
     [Parameter]
     public string Format
     {
