@@ -108,7 +108,7 @@
                                 {
                                     <td></td>
                                 }
-                                @if (Columns.Any(c => !c.Visible) || DetailTemplate != null)
+                                @if (Columns.Any(c => !c.Visible) || (DetailTemplate != null && ShowDetails))
                                 {
                                     <td></td>
                                 }
@@ -152,7 +152,7 @@
                         {
                             <td></td>
                         }
-                        @if (Columns.Any(c => !c.Visible) || DetailTemplate != null)
+                        @if (Columns.Any(c => !c.Visible) || (DetailTemplate != null && ShowDetails))
                         {
                             <td></td>
                         }

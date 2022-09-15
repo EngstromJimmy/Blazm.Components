@@ -1,11 +1,11 @@
 ﻿@namespace Blazm.Components
 @typeparam TItem
 
-@if ((ContainerGrid.DetailTemplate!=null || ContainerGrid.Columns.Any(c=>c.Visible==false)) && ContainerGrid.ExpandedRows.Contains(Row.GetHashCode()))
+@if (((ContainerGrid.DetailTemplate != null && ContainerGrid.ShowDetails) || ContainerGrid.Columns.Any(c => c.Visible == false)) && ContainerGrid.ExpandedRows.Contains(Row.GetHashCode()))
 {
     <tr>
         <td colspan="@ContainerGrid.VisibleColumns">
-            @if (ContainerGrid.DetailTemplate != null)
+            @if (ContainerGrid.DetailTemplate != null && ContainerGrid.ShowDetails)
             {
                 @ContainerGrid.DetailTemplate(Row)                
             }

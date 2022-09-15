@@ -2,7 +2,7 @@
 @namespace Blazm.Components
 <CascadingValue Value="ContainerGrid">
     <tr>
-        @if (ContainerGrid.Columns.Any(c => !c.Visible) || ContainerGrid.DetailTemplate != null)
+        @if (ContainerGrid.Columns.Any(c => !c.Visible) || (ContainerGrid.DetailTemplate != null && ContainerGrid.ShowDetails))
         {
             <th></th>
         }
@@ -32,7 +32,7 @@
     @if (ContainerGrid.Columns.Any(c => c.CanFilter) && ContainerGrid.ShowFilter)
     {
 <tr>
-    @if (ContainerGrid.Columns.Any(c => !c.Visible) || ContainerGrid.DetailTemplate != null)
+            @if (ContainerGrid.Columns.Any(c => !c.Visible) || (ContainerGrid.DetailTemplate != null && ContainerGrid.ShowDetails))
     {
         <td>
         </td>

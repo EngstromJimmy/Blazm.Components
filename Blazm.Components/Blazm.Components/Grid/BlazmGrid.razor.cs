@@ -170,6 +170,12 @@ namespace Blazm.Components
         public Func<TItem?, string>? RowCss { get; set; } = null;
 
         [Parameter]
+        public Func<TItem?, bool>? RowShowDetails { get; set; } = null;
+
+        [Parameter]
+        public bool ShowDetails { get; set; } = true;
+
+        [Parameter]
         public ItemsProviderDelegate<TItem>? ItemsProvider { get; set; } = null;
 
         [Parameter]
@@ -552,7 +558,7 @@ namespace Blazm.Components
 
         }
 
-        public int VisibleColumns => Columns.Where(c => c.Visible).Count() + (ShowCheckbox ? 1 : 0) + (DetailTemplate != null ? 1 : 0) + (Columns.Any(c => c.Visible == false) ? 1 : 0);
+        public int VisibleColumns => Columns.Where(c => c.Visible).Count() + (ShowCheckbox ? 1 : 0) + ((DetailTemplate != null && ShowDetails) ? 1 : 0) + (Columns.Any(c => c.Visible == false) ? 1 : 0);
 
         void IGridContainer.AddColumn(IGridColumn column)
         {
@@ -704,7 +710,7 @@ namespace Blazm.Components
                                         continue;
                                     }
                                 }
-                                if (Columns.Any(c => !c.Visible) || DetailTemplate != null)
+                                if (Columns.Any(c => !c.Visible) || (DetailTemplate != null && ShowDetails))
                                 {
                                     //Don't count detail arrow
                                     counter = -1;

@@ -2,11 +2,17 @@
 @namespace Blazm.Components
 
 <CascadingValue Value="ContainerGrid">
-    <tr @key="Row" class="@(ContainerGrid.Columns.Any(c => !c.Visible) || ContainerGrid.DetailTemplate != null ? "expandable" : "") @(ContainerGrid.RowCss!=null?ContainerGrid.RowCss(Row):"")">
-        @if (ContainerGrid.Columns.Any(c => !c.Visible) || ContainerGrid.ShowCheckbox || ContainerGrid.DetailTemplate != null)
+    <tr @key="Row" class="@(ContainerGrid.Columns.Any(c => !c.Visible) || (ContainerGrid.DetailTemplate != null && ContainerGrid.ShowDetails) ? "expandable" : "") @(ContainerGrid.RowCss!=null?ContainerGrid.RowCss(Row):"")">
+        @if (ContainerGrid.Columns.Any(c => !c.Visible) || ContainerGrid.ShowCheckbox || (ContainerGrid.DetailTemplate != null && ContainerGrid.ShowDetails))
         {
-            
-                @if (ContainerGrid.Columns.Any(c => !c.Visible) || ContainerGrid.DetailTemplate != null)
+
+            @if (ContainerGrid.Columns.Any(c => !c.Visible) || (ContainerGrid.DetailTemplate != null && ContainerGrid.ShowDetails))
+                {
+                if (ContainerGrid.RowShowDetails != null && !ContainerGrid.RowShowDetails(Row))
+                {
+                   <td></td> 
+                }
+                else
                 {
                     <td @onclick="@(() => { if (ContainerGrid.ExpandedRows.Contains(Row.GetHashCode())) { ContainerGrid.ExpandedRows.Remove(Row.GetHashCode()); } else { ContainerGrid.ExpandedRows.Add(Row.GetHashCode()); } })">
                     @if (ContainerGrid.ExpandedRows.Contains(Row.GetHashCode()))
@@ -18,7 +24,10 @@
                         @ContainerGrid.CollapsedTemplate
                     }
                     </td>
+                    }
                 }
+
+                
                 @if (ContainerGrid.ShowCheckbox)
                 {
                     <td @onclick="async eventArgs => { await ContainerGrid.SelectItemAsync(Row, !ContainerGrid.IsItemSelected(Row)); }">
