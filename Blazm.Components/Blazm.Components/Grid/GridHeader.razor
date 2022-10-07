@@ -29,7 +29,7 @@
         }
     </tr>
 
-    @if (ContainerGrid.Columns.Any(c => c.CanFilter) && ContainerGrid.ShowFilter)
+    @if (ContainerGrid.Columns.Any(c => c.CanFilter) && ContainerGrid.ShowFilter && !HideFilter)
     {
 <tr>
             @if (ContainerGrid.Columns.Any(c => !c.Visible) || (ContainerGrid.DetailTemplate != null && ContainerGrid.ShowDetails))
@@ -117,7 +117,8 @@
     public BlazmGrid<TItem> ContainerGrid { get; set; } = default!;
     [Parameter]
     public TItem? FirstRow { get; set; } = default!;
-
+    [Parameter]
+    public bool HideFilter { get; set; } = false;
     private void SetFilter(IGridColumn column, Filter filter,FilterType filterType)
     {
         filter.FilterType = filterType;

@@ -7,33 +7,33 @@
         {
 
             @if (ContainerGrid.Columns.Any(c => !c.Visible) || (ContainerGrid.DetailTemplate != null && ContainerGrid.ShowDetails))
-                {
+            {
                 if (ContainerGrid.RowShowDetails != null && !ContainerGrid.RowShowDetails(Row))
                 {
-                   <td></td> 
+                    <td></td>
                 }
                 else
                 {
                     <td @onclick="@(() => { if (ContainerGrid.ExpandedRows.Contains(Row.GetHashCode())) { ContainerGrid.ExpandedRows.Remove(Row.GetHashCode()); } else { ContainerGrid.ExpandedRows.Add(Row.GetHashCode()); } })">
-                    @if (ContainerGrid.ExpandedRows.Contains(Row.GetHashCode()))
-                    {
-                        @ContainerGrid.ExpandedTemplate
-                    }
-                    else
-                    {
-                        @ContainerGrid.CollapsedTemplate
-                    }
+                        @if (ContainerGrid.ExpandedRows.Contains(Row.GetHashCode()))
+                        {
+                            @ContainerGrid.ExpandedTemplate
+                        }
+                        else
+                        {
+                            @ContainerGrid.CollapsedTemplate
+                        }
                     </td>
-                    }
                 }
+            }
 
-                
-                @if (ContainerGrid.ShowCheckbox)
-                {
-                    <td @onclick="async eventArgs => { await ContainerGrid.SelectItemAsync(Row, !ContainerGrid.IsItemSelected(Row)); }">
-                        <input type="checkbox" checked="@(ContainerGrid.IsItemSelected(Row))" @onchange="async eventArgs => { await ContainerGrid.SelectItemAsync(Row, eventArgs.Value); }" />
-                    </td>
-                }
+
+            @if (ContainerGrid.ShowCheckbox)
+            {
+                <td @onclick="async eventArgs => { await ContainerGrid.SelectItemAsync(Row, !ContainerGrid.IsItemSelected(Row)); }">
+                    <input type="checkbox" checked="@(ContainerGrid.IsItemSelected(Row))" @onchange="async eventArgs => { await ContainerGrid.SelectItemAsync(Row, eventArgs.Value); }" />
+                </td>
+            }
         }
         @foreach (var column in ContainerGrid.Columns)
         {
@@ -49,11 +49,11 @@
                 {
                     stringValue = string.Format(column.Format, TypeDescriptor.GetProperties(Row)[column.Field].GetValue(Row));
                 }
-                <td class="@column.Class @ContainerGrid.GetSignClass(column, stringValue) @column.DataClass" @onclick="@(() => { if (ContainerGrid.ExpandedRows.Contains(Row.GetHashCode())) { ContainerGrid.ExpandedRows.Remove(Row.GetHashCode()); } else { ContainerGrid.ExpandedRows.Add(Row.GetHashCode()); } })">@stringValue</td>
+                <td class="@column.Class @ContainerGrid.GetSignClass(column, stringValue) @column.DataClass" @onclick="ExpandRow">@stringValue</td>
             }
             else
             {
-                <td class="@column.Class @column.DataClass" @onclick="@(() => { if (ContainerGrid.ExpandedRows.Contains(Row.GetHashCode())) { ContainerGrid.ExpandedRows.Remove(Row.GetHashCode()); } else { ContainerGrid.ExpandedRows.Add(Row.GetHashCode()); } })">@column.Template(Row)</td>
+                <td class="@column.Class @column.DataClass" @onclick="ExpandRow">@column.Template(Row)</td>
             }
         }
     </tr>
@@ -65,5 +65,24 @@
     public BlazmGrid<TItem> ContainerGrid { get; set; } = default!;
     [Parameter]
     public TItem? Row { get; set; } = default!;
+
+    public void ExpandRow()
+    {
+        if (ContainerGrid.DetailTemplate != null && ContainerGrid.ShowDetails)
+        {
+            if (ContainerGrid.RowShowDetails == null || ContainerGrid.RowShowDetails(Row))
+            {
+                if (ContainerGrid.ExpandedRows.Contains(Row.GetHashCode()))
+                {
+                    ContainerGrid.ExpandedRows.Remove(Row.GetHashCode());
+                }
+                else
+                {
+                    ContainerGrid.ExpandedRows.Add(Row.GetHashCode());
+                }
+            }
+        }
+    }
+
 
 }

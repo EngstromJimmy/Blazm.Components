@@ -95,12 +95,12 @@ namespace Blazm.Components.Dynamic
                 get { return m_Instance[m_Name].GetType(); }
             }
 
-            public override void SetValue(object component, object value)
+            public override void SetValue(object? component, object? value)
             {
                 m_Instance[m_Name] = value;
             }
 
-            public override object GetValue(object component)
+            public override object GetValue(object? component)
             {
                 return m_Instance[m_Name];
             }

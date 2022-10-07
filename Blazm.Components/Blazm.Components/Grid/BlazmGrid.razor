@@ -70,58 +70,67 @@
                     }
 
                     var groupedData = Data.GroupBy(GroupBy);
+                    if(ShowFilter)
+                    {
+                        <GridHeader FirstRow="firstRow" />
+                    }
                     foreach (var d in groupedData)
                     {
-                        <tbody>
-                            @if (GroupHeader != null)
+                            var groupData = d.ToList();
+                            if (SortField != null)
                             {
-                                <tr class="headerrow">
-                                    <td colspan="@VisibleColumns"> @GroupHeader(d.Key)</td>
+                                if (SortDirection == ListSortDirection.Descending)
+                                {
+                                    groupData = groupData.OrderByDescending(x => x.GetType().GetProperty(SortField)?.GetValue(x, null)).ToList();
+                                }
+                                else
+                                {
+                                    groupData = groupData.OrderBy(x => x.GetType().GetProperty(SortField)?.GetValue(x, null)).ToList();
+                                }
+                            }
+                            var groupedandfiltered = ApplyFilter(groupData);
+                        
+
+                        if (groupedandfiltered.Any())
+                        {
+                            <tbody>
+                                @if (GroupHeader != null)
+                                {
+                                    <tr class="headerrow">
+                                        <td colspan="@VisibleColumns"> @GroupHeader(d.Key)</td>
+                                    </tr>
+                                }
+                                <GridHeader FirstRow="firstRow" HideFilter="true" />
+
+
+
+                                @foreach (var row in groupedandfiltered)
+                                {
+                                    <GridDataRow Row="row" />
+                                }
+                            </tbody>
+                            @if (ShowGroupFooter)
+                            {
+                                <tr class="footerrow">
+                                    @if (ShowCheckbox)
+                                    {
+                                        <td></td>
+                                    }
+                                    @if (Columns.Any(c => !c.Visible) || (DetailTemplate != null && ShowDetails))
+                                    {
+                                        <td></td>
+                                    }
+                                    @foreach (var column in Columns.Where(c => c.Visible))
+                                    {
+                                        <td class="@column.Class">
+                                            @if (column.GroupFooterTemplate != null)
+                                            {
+                                                @column.GroupFooterTemplate(d.ToList())
+                                            }
+                                        </td>
+                                    }
                                 </tr>
                             }
-                            <GridHeader FirstRow="firstRow" />
-                            @{
-                                var groupData = d.ToList();
-                                if (SortField != null)
-                                {
-                                    if (SortDirection == ListSortDirection.Descending)
-                                    {
-                                        groupData = groupData.OrderByDescending(x => x.GetType().GetProperty(SortField).GetValue(x, null)).ToList();
-                                    }
-                                    else
-                                    {
-                                        groupData = groupData.OrderBy(x => x.GetType().GetProperty(SortField).GetValue(x, null)).ToList();
-                                    }
-                                }
-                            }
-
-
-                            @foreach (var row in ApplyFilter(groupData))
-                            {
-                                <GridDataRow Row="row" />
-                            }
-                        </tbody>
-                        @if (ShowGroupFooter)
-                        {
-                            <tr class="footerrow">
-                                @if (ShowCheckbox)
-                                {
-                                    <td></td>
-                                }
-                                @if (Columns.Any(c => !c.Visible) || (DetailTemplate != null && ShowDetails))
-                                {
-                                    <td></td>
-                                }
-                                @foreach (var column in Columns.Where(c => c.Visible))
-                                {
-                                    <td class="@column.Class">
-                                        @if (column.GroupFooterTemplate != null)
-                                        {
-                                            @column.GroupFooterTemplate(d.ToList())
-                                        }
-                                    </td>
-                                }
-                            </tr>
                         }
                     }
                 }
