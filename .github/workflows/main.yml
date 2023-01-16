@@ -2,7 +2,7 @@
 
 name: Deploy sample project
 env:
-  PUBLISH_DIR: Blazm.Components/BlazmWebAssemblyDemo/bin/Release/net6.0/publish/wwwroot
+  PUBLISH_DIR: Blazm.Components/BlazmWebAssemblyDemo/bin/Release/net7.0/publish/wwwroot
 
 # Controls when the workflow will run
 on:
@@ -29,7 +29,7 @@ jobs:
       
       - uses: actions/setup-dotnet@v1
         with:
-          dotnet-version: '6.0.x'
+          dotnet-version: '7.0.x'
           include-prerelease: true
       
       - name: Publish application

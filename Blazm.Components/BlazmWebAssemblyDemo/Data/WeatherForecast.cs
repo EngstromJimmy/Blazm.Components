@@ -4,7 +4,7 @@ namespace BlazmWebAssemblyDemo.Data;
 
 public class WeatherForecast
 {
-    public DateTime Date { get; set; }
+    public DateTime? Date { get; set; }
 
     [Display(Name = "In C (From display attribute)")]
     public int TemperatureC { get; set; }

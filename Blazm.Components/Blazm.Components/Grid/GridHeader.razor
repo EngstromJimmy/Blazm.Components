@@ -70,15 +70,15 @@
                                 }
                                     if (type == typeof(string))
                                     {
-                                <input type="Text" @bind="f.FilterValue" @bind:event="oninput" @onkeyup="c.ApplyFilter" />
+                                        <input type="Text" @bind="f.FilterValue" @bind:event="oninput" @onkeyup="c.ApplyFilter" />
                                     }
-                                    else if (type == typeof(DateTime))
+                                    else if (type == typeof(DateTime) || type == typeof(DateTime?))
                                     {
-                                <input type="Date" @bind="f.FilterValue" @bind:event="oninput" @onkeyup="c.ApplyFilter" @onchange="c.ApplyFilter" />
+                                        <input type="Date" @bind="f.FilterValue" @bind:event="oninput" @onkeyup="c.ApplyFilter" @onchange="c.ApplyFilter" />
                                     }
                                     else
                                     {
-                                <input type="number" @bind="f.FilterValue" @bind:event="oninput" @onkeyup="c.ApplyFilter" />
+                                        <input type="number" @bind="f.FilterValue" @bind:event="oninput" @onkeyup="c.ApplyFilter" />
                                     }
                                     if(c.ShowAdvancedFilter)
                                     {

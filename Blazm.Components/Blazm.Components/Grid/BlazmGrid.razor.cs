@@ -3,6 +3,7 @@ using BlazorPro.BlazorSize;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Web.Virtualization;
 using Microsoft.JSInterop;
+using NPOI.SS.Formula.Functions;
 using NPOI.SS.UserModel;
 using NPOI.XSSF.UserModel;
 using System;
@@ -314,7 +315,8 @@ namespace Blazm.Components
                             }
                             else
                             {
-                                filtervalue = Convert.ChangeType(f.FilterValue, columnType);
+                                columnType=  Nullable.GetUnderlyingType(columnType) ?? columnType;
+								filtervalue = Convert.ChangeType(f.FilterValue, columnType);
                             }
                         }
                         catch
@@ -448,7 +450,7 @@ namespace Blazm.Components
                 }
             }
             MemoryStream ms = new MemoryStream();
-            workbook.Write(ms);
+            workbook.Write(ms,false);
             byte[] bytes = ms.ToArray();
             ms.Close();
 
@@ -768,7 +770,7 @@ namespace Blazm.Components
                 return Expression.Lambda<Func<T, bool>>(containsMethodExpwithnullcheck, parameterExp);
 
             }
-            else if ((filterType == FilterType.Equal && propertyExp.Type == typeof(DateTime)))
+            else if ((filterType == FilterType.Equal && (propertyExp.Type == typeof(DateTime) || propertyExp.Type == typeof(DateTime?))))
             {
                 const string dateFormat = "yyyy-MM-dd HH:mm";
                 var parsedDate = DateTime.ParseExact(((DateTime)filterValue).ToString(dateFormat), dateFormat, CultureInfo.InvariantCulture);
@@ -776,8 +778,8 @@ namespace Blazm.Components
                 var dayStart = new DateTime(parsedDate.Year, parsedDate.Month, parsedDate.Day, 0, 0, 0, 0);
                 var dayEnd = new DateTime(parsedDate.Year, parsedDate.Month, parsedDate.Day, 23, 59, 59, 999);
 
-                var left = Expression.Lambda<Func<T, bool>>(Expression.GreaterThanOrEqual(propertyExp, Expression.Constant(dayStart)), parameterExp);
-                var right = Expression.Lambda<Func<T, bool>>(Expression.LessThanOrEqual(propertyExp, Expression.Constant(dayEnd)), parameterExp);
+                var left = Expression.Lambda<Func<T, bool>>(Expression.GreaterThanOrEqual(propertyExp, Expression.Constant(dayStart,propertyExp.Type)), parameterExp);
+                var right = Expression.Lambda<Func<T, bool>>(Expression.LessThanOrEqual(propertyExp, Expression.Constant(dayEnd, propertyExp.Type)), parameterExp);
 
                 return left.And(right);
             }
