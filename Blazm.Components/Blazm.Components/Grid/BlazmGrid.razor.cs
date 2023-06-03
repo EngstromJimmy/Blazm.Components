@@ -260,9 +260,9 @@ namespace Blazm.Components
                     var type = typeof(TItem).GetProperty(SortField)?.PropertyType;
                     if (SortDirection == ListSortDirection.Descending)
                     {
-                        if (type == typeof(string))
+                        if (type.Name == "String")
                         {
-                            pagedData = pagedData.OrderByDescending(x => (string?)x?.GetType().GetProperty(SortField)?.GetValue(x, null), StringComparer.InvariantCultureIgnoreCase).ToList();
+                            pagedData = pagedData.OrderByDescending(x => (string?)x?.GetType().GetProperty(SortField)?.GetValue(x, null), StringComparer.OrdinalIgnoreCase).ToList();
                         }
                         else
                         {
@@ -271,9 +271,9 @@ namespace Blazm.Components
                     }
                     else
                     {
-                        if (type == typeof(string))
+                        if (type.Name == "String")
                         {
-                            pagedData = pagedData.OrderBy(x => (string?)x?.GetType().GetProperty(SortField)?.GetValue(x, null), StringComparer.InvariantCultureIgnoreCase).ToList();
+                            pagedData = pagedData.OrderBy(x => (string?)x?.GetType().GetProperty(SortField)?.GetValue(x, null), StringComparer.OrdinalIgnoreCase).ToList();
                         }
                         else
                         {
