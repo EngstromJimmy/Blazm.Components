@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Components.Web.Virtualization;
 using Microsoft.JSInterop;
 using NPOI.SS.Formula.Functions;
 using NPOI.SS.UserModel;
+using NPOI.XSSF.Streaming.Values;
 using NPOI.XSSF.UserModel;
 using System;
 using System.Collections.Generic;
@@ -97,12 +98,19 @@ namespace Blazm.Components
             set;
         } = false;
 
+        private string? _sortField=null;
         [Parameter]
         public string? SortField
         {
-            get;
-            set;
-        } = null;
+            get { return _sortField; }
+            set 
+            { 
+                _sortField = value;
+            }
+        }
+
+        [Parameter]
+        public EventCallback<string> SortFieldChanged { get; set; }
 
         [Parameter]
         public bool ShowPageCounter
@@ -124,11 +132,15 @@ namespace Blazm.Components
             get; set;
         } = System.ComponentModel.ListSortDirection.Ascending;
 
+
         [Parameter]
         public System.ComponentModel.ListSortDirection SortDirection
         {
             get; set;
         } = System.ComponentModel.ListSortDirection.Ascending;
+
+        [Parameter]
+        public EventCallback<ListSortDirection> SortDirectionChanged { get; set; }
 
         [Parameter]
         public RenderFragment GridColumns
@@ -610,10 +622,12 @@ namespace Blazm.Components
                         {
                             SortDirection = ListSortDirection.Descending;
                         }
+                        await SortDirectionChanged.InvokeAsync(SortDirection);
                     }
                     else
                     {
                         SortField = column.Field;
+                        await SortFieldChanged.InvokeAsync(column.Field);
                     }
                     await RefreshDataAsync();
                     StateHasChanged();

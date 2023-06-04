@@ -2,13 +2,14 @@
 
 @using Blazm.Components
 @using BlazmWebAssemblyDemo.Data
+@using System.ComponentModel;
 @inject WeatherForecastService ForecastService
 
 <h1>Select demo</h1>
 
 <p>This is a demo of the select feature</p>
 
-<BlazmGrid ShowCheckbox="true" SelectedDataChanged="@((List<WeatherForecast>list)=>OnSelectChanged(list))" Data="forecasts" PageSize="10" Sortable="true" SortField="@nameof(WeatherForecast.Date)" ShowFooter="true">
+<BlazmGrid ShowCheckbox="true" @bind-SelectedData="selectedforecasts" @bind-GroupSortDirection="SortDirection"  Data="forecasts" PageSize="10" Sortable="true" @bind-SortField="@SortField" ShowFooter="true">
     <GridColumns>
         <GridColumn Field="@nameof(WeatherForecast.Date)" Format="{0:d}" Priority="3" />
         <GridColumn Field="@nameof(WeatherForecast.TemperatureC)" HighlightSign="true" Priority="1" Class="alignRight"/> 
@@ -16,16 +17,25 @@
     </GridColumns>
 </BlazmGrid>
 
-Selected items: @numberofselecteditems
+Selected items: @selectedforecasts.Count()
 
+<button @onclick="ClearSelection">Clear selection</button>
 
 @code {
     int numberofselecteditems = 0;
     private WeatherForecast[] forecasts;
+    private List<WeatherForecast> selectedforecasts=new();
     private BlazmGrid<WeatherForecast> GroupedGrid;
+    private string SortField = nameof(WeatherForecast.Date);
+    private ListSortDirection SortDirection =ListSortDirection.Ascending;
     protected override async Task OnInitializedAsync()
     {
         forecasts = await ForecastService.GetForecastAsync(DateTime.Now);
+    }
+
+    public void ClearSelection()
+    {
+        selectedforecasts.Clear();
     }
 
     public Task OnSelectChanged(List<WeatherForecast> list)

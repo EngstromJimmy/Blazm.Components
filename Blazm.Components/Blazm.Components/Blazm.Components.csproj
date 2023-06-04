@@ -5,7 +5,7 @@
     <LangVersion>latest</LangVersion>
     <Authors>Jimmy Engström</Authors>
     <Description>A collection of Blazor components</Description>
-    <Version>1.2.3</Version>
+    <Version>1.2.5</Version>
     <Nullable>enable</Nullable>
     <PackageProjectUrl>https://github.com/EngstromJimmy/Blazm.Components</PackageProjectUrl>
     <RepositoryUrl>https://github.com/EngstromJimmy/Blazm.Components</RepositoryUrl>
